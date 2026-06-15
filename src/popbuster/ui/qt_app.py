@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 
 from PySide6.QtCore import QTimer, Qt, QUrl
-from PySide6.QtGui import QCursor, QFont, QFontDatabase, QKeyEvent
+from PySide6.QtGui import QCursor, QFont, QFontDatabase, QKeyEvent, QPixmap
 from PySide6.QtMultimedia import QAudioOutput, QMediaPlayer
 from PySide6.QtMultimediaWidgets import QVideoWidget
 from PySide6.QtWidgets import (
@@ -28,6 +28,8 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 CATALOG_PATH = PROJECT_ROOT / "assets" / "tapes.json"
 FONT_PATH = PROJECT_ROOT / "assets" / "fonts" / "Modeseven-L3n5.ttf"
 APP_START_VIDEO_PATH = PROJECT_ROOT / "assets" / "videos" / "app_start.mp4"
+APP_START_FRAME_DIR = PROJECT_ROOT / "assets" / "videos" / "app_start_frames"
+APP_START_FRAME_INTERVAL_MS = 83
 STATE_DIR = Path(os.environ.get("POPBUSTER_STATE_DIR", Path.home() / ".popbuster"))
 RESUME_PATH = STATE_DIR / "resume_positions.json"
 CONFIG_PATH = STATE_DIR / "config.json"
@@ -86,11 +88,16 @@ class OutputWindow(KeyWindow):
             f"background: #000; color: #f7f7f7; padding: {self.message_padding}px;"
         )
 
+        self.current_image: QPixmap | None = None
+        self.image = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
+        self.image.setStyleSheet("background: #000;")
+
         self.video = QVideoWidget()
         self.video.setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
         self.video.setStyleSheet("background: #000;")
 
         self.stack.addWidget(self.message)
+        self.stack.addWidget(self.image)
         self.stack.addWidget(self.video)
         self.setCentralWidget(self.stack)
 
@@ -105,6 +112,26 @@ class OutputWindow(KeyWindow):
     def show_video(self) -> None:
         self.stack.setCurrentWidget(self.video)
 
+    def show_image(self, pixmap: QPixmap) -> None:
+        self.current_image = pixmap
+        self._refresh_image()
+        self.stack.setCurrentWidget(self.image)
+
+    def resizeEvent(self, event) -> None:
+        super().resizeEvent(event)
+        self._refresh_image()
+
+    def _refresh_image(self) -> None:
+        if self.current_image is None:
+            return
+        self.image.setPixmap(
+            self.current_image.scaled(
+                self.image.size(),
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            )
+        )
+
 
 class InternalWindow(KeyWindow):
     def __init__(self) -> None:
@@ -118,10 +145,15 @@ class InternalWindow(KeyWindow):
         self.logo.setFont(appliance_font(22))
         self.logo.setStyleSheet("background: #000; color: #f7f7f7; padding: 20px;")
 
+        self.current_image: QPixmap | None = None
+        self.image = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
+        self.image.setStyleSheet("background: #000;")
+
         self.video = QVideoWidget()
         self.video.setStyleSheet("background: #000;")
 
         self.stack.addWidget(self.logo)
+        self.stack.addWidget(self.image)
         self.stack.addWidget(self.video)
 
         root = QWidget()
@@ -139,6 +171,26 @@ class InternalWindow(KeyWindow):
 
     def show_video(self) -> None:
         self.stack.setCurrentWidget(self.video)
+
+    def show_image(self, pixmap: QPixmap) -> None:
+        self.current_image = pixmap
+        self._refresh_image()
+        self.stack.setCurrentWidget(self.image)
+
+    def resizeEvent(self, event) -> None:
+        super().resizeEvent(event)
+        self._refresh_image()
+
+    def _refresh_image(self) -> None:
+        if self.current_image is None:
+            return
+        self.image.setPixmap(
+            self.current_image.scaled(
+                self.image.size(),
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            )
+        )
 
 
 class QtDisplayVideoAdapter:
@@ -267,6 +319,12 @@ class DesktopApp:
         self.boot_timer.setInterval(850)
         self.boot_timer.timeout.connect(self._boot_tick)
 
+        self.app_intro_frames = sorted(APP_START_FRAME_DIR.glob("frame_*.jpg"))
+        self.app_intro_frame_index = 0
+        self.app_intro_frame_timer = QTimer()
+        self.app_intro_frame_timer.setInterval(APP_START_FRAME_INTERVAL_MS)
+        self.app_intro_frame_timer.timeout.connect(self._app_intro_frame_tick)
+
         self.bumper_timer = QTimer()
         self.bumper_timer.setSingleShot(True)
         self.bumper_timer.setInterval(1800)
@@ -292,9 +350,16 @@ class DesktopApp:
     def _start_app_intro(self) -> None:
         if (
             not self.controller.config.opening_jingle_enabled
-            or not APP_START_VIDEO_PATH.exists()
+            or (not self.app_intro_frames and not APP_START_VIDEO_PATH.exists())
         ):
             self._start_boot_sequence()
+            return
+
+        if self.app_intro_frames:
+            print(f"popbuster: app-start frame intro ({len(self.app_intro_frames)} frames)")
+            self.app_intro_frame_index = 0
+            self._app_intro_frame_tick()
+            self.app_intro_frame_timer.start()
             return
 
         self.playing_app_start_video = True
@@ -305,9 +370,28 @@ class DesktopApp:
 
     def _start_boot_sequence(self) -> None:
         self.playing_app_start_video = False
+        self.app_intro_frame_timer.stop()
         self.adapter.stop()
         self._boot_tick()
         self.boot_timer.start()
+
+    def _app_intro_frame_tick(self) -> None:
+        if self.app_intro_frame_index >= len(self.app_intro_frames):
+            self._start_boot_sequence()
+            return
+
+        frame = QPixmap(str(self.app_intro_frames[self.app_intro_frame_index]))
+        if frame.isNull():
+            print(
+                "popbuster: app-start frame failed to load "
+                f"({self.app_intro_frames[self.app_intro_frame_index]})"
+            )
+            self._start_boot_sequence()
+            return
+
+        self.output.show_image(frame)
+        self.internal.show_image(frame)
+        self.app_intro_frame_index += 1
 
     def _boot_tick(self) -> None:
         if self.controller.boot_message(self.boot_index):

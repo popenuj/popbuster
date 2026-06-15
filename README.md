@@ -125,7 +125,7 @@ The default macOS/development mode still opens two mirrored windows. Pi mode use
 
 The default tape catalog points at `../Content/Movies/ML_tut_area2.mp4` when running inside the current workspace, so this prototype has a local video to play immediately.
 
-For current development, the simulated DSI and HDMI windows mirror the same feed. At application startup, Popbuster plays `assets/videos/app_start.mp4` on both simulated displays before the text boot/loading sequence when the opening jingle setting is on. If that file is missing or the setting is off, the app skips directly to the text boot sequence.
+For current development, the simulated DSI and HDMI windows mirror the same feed. At application startup, Popbuster plays the frame sequence in `assets/videos/app_start_frames/` before the text boot/loading sequence when the opening jingle setting is on. This avoids relying on QtMultimedia's video surface during startup on the Pi. If those frames are missing, Popbuster falls back to `assets/videos/app_start.mp4`; if neither asset is available or the setting is off, the app skips directly to the text boot sequence.
 
 For a real Popbuster test clip, place a video at:
 

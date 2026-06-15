@@ -7,6 +7,8 @@ SESSION_TEMPLATE="${PROJECT_ROOT}/support/lightdm/${SESSION_NAME}.desktop.in"
 WAYLAND_SESSION_TARGET="/usr/share/wayland-sessions/${SESSION_NAME}.desktop"
 X_SESSION_TARGET="/usr/share/xsessions/${SESSION_NAME}.desktop"
 LIGHTDM_CONF="/etc/lightdm/lightdm.conf.d/90-popbuster-kiosk.conf"
+LIGHTDM_MAIN_CONF="/etc/lightdm/lightdm.conf"
+LIGHTDM_MAIN_BACKUP="/etc/lightdm/lightdm.conf.before-popbuster-kiosk"
 
 if [[ ! -f "${SESSION_TEMPLATE}" ]]; then
   echo "Missing kiosk session template: ${SESSION_TEMPLATE}" >&2
@@ -40,6 +42,15 @@ user-session=${SESSION_NAME}
 EOF
 sudo chmod 0644 "${LIGHTDM_CONF}"
 
+if [[ -f "${LIGHTDM_MAIN_CONF}" ]]; then
+  sudo cp -n "${LIGHTDM_MAIN_CONF}" "${LIGHTDM_MAIN_BACKUP}"
+  sudo sed -i \
+    -e "s/^autologin-user=.*/autologin-user=${USER}/" \
+    -e "s/^autologin-session=.*/autologin-session=${SESSION_NAME}/" \
+    -e "s/^user-session=.*/user-session=${SESSION_NAME}/" \
+    "${LIGHTDM_MAIN_CONF}"
+fi
+
 systemctl --user disable --now popbuster.service >/dev/null 2>&1 || true
 
 cat <<EOF
@@ -48,6 +59,9 @@ Installed Popbuster kiosk session.
 Session files:
   ${WAYLAND_SESSION_TARGET}
   ${X_SESSION_TARGET}
+
+LightDM main config backup:
+  ${LIGHTDM_MAIN_BACKUP}
 
 Next reboot should skip the normal desktop and start Popbuster through cage:
   sudo reboot

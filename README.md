@@ -215,6 +215,14 @@ A brief black screen with a blinking text cursor between Plymouth and Popbuster 
 
 The kiosk installer creates a transparent cursor theme at `~/.icons/popbuster-blank` and starts the kiosk compositor with that cursor theme. This hides the compositor-level mouse pointer before Qt has a chance to draw Popbuster.
 
+To diagnose whether the visible pointer belongs to Qt or the compositor, run one boot with:
+
+```bash
+POPBUSTER_CURSOR_MODE=debug scripts/run-pi
+```
+
+In debug mode, Popbuster uses a bright magenta square cursor. If the visible pointer changes to that square, Qt owns the cursor; if it remains the default arrow, the compositor owns it.
+
 If kiosk mode fails, recover over SSH:
 
 ```bash

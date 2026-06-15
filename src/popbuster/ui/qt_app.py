@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 
 from PySide6.QtCore import QTimer, Qt, QUrl
-from PySide6.QtGui import QCursor, QFont, QFontDatabase, QKeyEvent, QPixmap
+from PySide6.QtGui import QColor, QCursor, QFont, QFontDatabase, QKeyEvent, QPixmap
 from PySide6.QtMultimedia import QAudioOutput, QMediaPlayer, QVideoFrame, QVideoSink
 from PySide6.QtWidgets import (
     QApplication,
@@ -57,7 +57,12 @@ def appliance_font(size: int, bold: bool = False) -> QFont:
     return font
 
 
-def transparent_cursor() -> QCursor:
+def fullscreen_cursor() -> QCursor:
+    if os.environ.get("POPBUSTER_CURSOR_MODE", "").lower() == "debug":
+        pixmap = QPixmap(32, 32)
+        pixmap.fill(QColor("#ff00ff"))
+        return QCursor(pixmap)
+
     pixmap = QPixmap(1, 1)
     pixmap.fill(Qt.GlobalColor.transparent)
     return QCursor(pixmap)
@@ -285,7 +290,7 @@ class DesktopApp:
         register_application_fonts()
         self.fullscreen = fullscreen
         self.single_display = single_display
-        self.blank_cursor = transparent_cursor()
+        self.blank_cursor = fullscreen_cursor()
         if self.fullscreen:
             self.qt.setOverrideCursor(self.blank_cursor)
 

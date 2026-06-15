@@ -27,6 +27,12 @@ if ! command -v python3 >/dev/null 2>&1; then
   exit 1
 fi
 
+if ! command -v xcursorgen >/dev/null 2>&1; then
+  echo "xcursorgen is required to install the blank cursor theme." >&2
+  echo "Install it first with: sudo apt install x11-apps" >&2
+  exit 1
+fi
+
 tmp_session="$(mktemp)"
 trap 'rm -f "${tmp_session}"' EXIT
 
@@ -43,50 +49,56 @@ cat > "${CURSOR_THEME_DIR}/index.theme" <<EOF
 Name=Popbuster Blank
 Comment=Transparent cursor theme for Popbuster kiosk mode
 EOF
-python3 - "${CURSOR_THEME_DIR}/cursors/left_ptr" <<'PY'
+cursor_source_dir="$(mktemp -d)"
+trap 'rm -f "${tmp_session}"; rm -rf "${cursor_source_dir}"' EXIT
+
+python3 - "${cursor_source_dir}/blank.png" <<'PY'
 from pathlib import Path
 import struct
 import sys
+import zlib
 
 target = Path(sys.argv[1])
 target.parent.mkdir(parents=True, exist_ok=True)
-
-magic = 0x72756358
-header_size = 16
-file_version = 0x00010000
-toc_count = 1
-image_type = 0xFFFD0002
-image_size = 24
-image_position = 28
-chunk_header_size = 36
-chunk_version = 1
 width = 24
 height = 24
-xhot = 0
-yhot = 0
-delay = 0
-transparent_argb = 0
+raw_rows = b"".join(b"\x00" + (b"\x00\x00\x00\x00" * width) for _ in range(height))
 
-with target.open("wb") as cursor:
-    cursor.write(struct.pack("<IIII", magic, header_size, file_version, toc_count))
-    cursor.write(struct.pack("<III", image_type, image_size, image_position))
-    cursor.write(
-        struct.pack(
-            "<IIIIIIIII",
-            chunk_header_size,
-            image_type,
-            image_size,
-            chunk_version,
-            width,
-            height,
-            xhot,
-            yhot,
-            delay,
-        )
+def chunk(kind: bytes, data: bytes) -> bytes:
+    return (
+        struct.pack(">I", len(data))
+        + kind
+        + data
+        + struct.pack(">I", zlib.crc32(kind + data) & 0xFFFFFFFF)
     )
-    cursor.write(struct.pack("<I", transparent_argb) * width * height)
+
+png = (
+    b"\x89PNG\r\n\x1a\n"
+    + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0))
+    + chunk(b"IDAT", zlib.compress(raw_rows))
+    + chunk(b"IEND", b"")
+)
+target.write_bytes(png)
 PY
-for cursor_name in default arrow top_left_arrow left_ptr_watch pointer hand; do
+
+cat > "${cursor_source_dir}/blank.cursor" <<EOF
+24 0 0 ${cursor_source_dir}/blank.png 0
+EOF
+
+xcursorgen "${cursor_source_dir}/blank.cursor" "${CURSOR_THEME_DIR}/cursors/left_ptr"
+for cursor_name in \
+  default \
+  arrow \
+  top_left_arrow \
+  left_ptr_watch \
+  pointer \
+  hand \
+  hand1 \
+  hand2 \
+  00000000000000020006000e7e9ffc3f \
+  3ecb610c1bf2410f44200f48c40d3599 \
+  9d800788f1b08800ae810202380a0822 \
+  e29285e634086352946a0e7090d73106; do
   ln -sf left_ptr "${CURSOR_THEME_DIR}/cursors/${cursor_name}"
 done
 

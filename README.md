@@ -193,7 +193,7 @@ Kiosk mode is an experiment to remove the brief desktop flash before Popbuster l
 Install the compositor dependency on the Pi:
 
 ```bash
-sudo apt install labwc
+sudo apt install labwc x11-apps
 ```
 
 After deploying Popbuster, install kiosk mode:
@@ -214,14 +214,6 @@ Popbuster fullscreen
 A brief black screen with a blinking text cursor between Plymouth and Popbuster is the Linux virtual terminal showing during session handoff. It is separate from the mouse pointer inside Popbuster. If it becomes distracting, try hiding the kernel console cursor later with `vt.global_cursor_default=0` in `/boot/firmware/cmdline.txt`; keep that as a separate boot-polish experiment.
 
 The kiosk installer creates a transparent cursor theme at `~/.icons/popbuster-blank` and starts the kiosk compositor with that cursor theme. This hides the compositor-level mouse pointer before Qt has a chance to draw Popbuster.
-
-To diagnose whether the visible pointer belongs to Qt or the compositor, run one boot with:
-
-```bash
-POPBUSTER_CURSOR_MODE=debug scripts/run-pi
-```
-
-In debug mode, Popbuster uses a bright magenta square cursor. If the visible pointer changes to that square, Qt owns the cursor; if it remains the default arrow, the compositor owns it.
 
 If kiosk mode fails, recover over SSH:
 

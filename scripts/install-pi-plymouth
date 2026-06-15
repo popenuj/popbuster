@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROJECT_ROOT="${POPBUSTER_PROJECT_ROOT:-${HOME}/popbuster}"
+SEQUENCE="${POPBUSTER_SPLASH_SEQUENCE:-ken_tv_unboxing}"
+THEME_NAME="popbuster"
+THEME_SOURCE="${PROJECT_ROOT}/support/plymouth/${THEME_NAME}"
+SEQUENCE_SOURCE="${THEME_SOURCE}/images/${SEQUENCE}"
+STATIC_SOURCE="${THEME_SOURCE}/images/static"
+THEME_TARGET="/usr/share/plymouth/themes/${THEME_NAME}"
+
+if [[ ! -d "${THEME_SOURCE}" ]]; then
+  echo "Missing Plymouth theme source: ${THEME_SOURCE}" >&2
+  echo "Run this script from a deployed Popbuster checkout on the Pi." >&2
+  exit 1
+fi
+
+if [[ ! -d "${SEQUENCE_SOURCE}" ]]; then
+  echo "Unknown splash sequence: ${SEQUENCE}" >&2
+  echo "Available sequences:" >&2
+  find "${THEME_SOURCE}/images" -mindepth 1 -maxdepth 1 -type d \
+    ! -name static -exec basename {} \; | sort >&2
+  exit 1
+fi
+
+if [[ ! -d "${STATIC_SOURCE}" ]]; then
+  echo "Missing static splash frames: ${STATIC_SOURCE}" >&2
+  exit 1
+fi
+
+if ! command -v plymouth-set-default-theme >/dev/null 2>&1; then
+  echo "plymouth-set-default-theme was not found." >&2
+  echo "Install Plymouth first, for example: sudo apt install plymouth plymouth-themes" >&2
+  exit 1
+fi
+
+tmp_dir="$(mktemp -d)"
+trap 'rm -rf "${tmp_dir}"' EXIT
+
+mkdir -p "${tmp_dir}/${THEME_NAME}/images/active"
+mkdir -p "${tmp_dir}/${THEME_NAME}/images/static"
+
+cp "${THEME_SOURCE}/popbuster.plymouth" "${tmp_dir}/${THEME_NAME}/"
+cp "${THEME_SOURCE}/popbuster.script" "${tmp_dir}/${THEME_NAME}/"
+cp "${SEQUENCE_SOURCE}"/frame_*.png "${tmp_dir}/${THEME_NAME}/images/active/"
+cp "${STATIC_SOURCE}"/frame_*.png "${tmp_dir}/${THEME_NAME}/images/static/"
+
+last_frame="$(find "${tmp_dir}/${THEME_NAME}/images/active" -name 'frame_*.png' | sort | tail -n 1)"
+for index in $(seq 1 11); do
+  frame_path="${tmp_dir}/${THEME_NAME}/images/active/frame_$(printf '%03d' "${index}").png"
+  if [[ ! -f "${frame_path}" ]]; then
+    cp "${last_frame}" "${frame_path}"
+  fi
+done
+
+sudo rm -rf "${THEME_TARGET}"
+sudo mkdir -p "$(dirname "${THEME_TARGET}")"
+sudo cp -R "${tmp_dir}/${THEME_NAME}" "${THEME_TARGET}"
+sudo plymouth-set-default-theme -R "${THEME_NAME}"
+
+cat <<EOF
+Installed Plymouth theme '${THEME_NAME}' using sequence '${SEQUENCE}'.
+
+Reboot to test it:
+  sudo reboot
+
+To install the other bundled sequence:
+  POPBUSTER_SPLASH_SEQUENCE=antenna_fixing scripts/install-pi-plymouth
+EOF

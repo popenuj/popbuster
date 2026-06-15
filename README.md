@@ -150,6 +150,32 @@ systemctl --user disable popbuster.service
 
 The installed unit lives at `~/.config/systemd/user/popbuster.service`. It runs `scripts/run-pi`, so the same `POPBUSTER_FULLSCREEN`, `POPBUSTER_SINGLE_DISPLAY`, and `WAYLAND_DISPLAY` overrides still apply through the service file.
 
+### Plymouth Boot Splash
+
+Popbuster includes a Plymouth theme for the early boot splash. The theme plays one short image sequence, then loops the static frames until the OS hands off to the desktop session and Popbuster autostarts.
+
+Bundled splash sequences:
+
+- `ken_tv_unboxing`
+- `antenna_fixing`
+
+The default install uses `ken_tv_unboxing`:
+
+```bash
+cd /home/johnp/popbuster
+scripts/install-pi-plymouth
+sudo reboot
+```
+
+To install the antenna sequence instead:
+
+```bash
+POPBUSTER_SPLASH_SEQUENCE=antenna_fixing scripts/install-pi-plymouth
+sudo reboot
+```
+
+The installer copies the selected sequence into `/usr/share/plymouth/themes/popbuster`, sets it as the default Plymouth theme, and rebuilds the boot image with `plymouth-set-default-theme -R popbuster`. Plymouth starts after the earliest firmware/kernel phase, so a tiny amount of Raspberry Pi boot output may still appear before the custom splash. The brief desktop flash is handled separately by the future kiosk-session work.
+
 ## Video
 
 The default tape catalog points at `../Content/Movies/ML_tut_area2.mp4` when running inside the current workspace, so this prototype has a local video to play immediately.

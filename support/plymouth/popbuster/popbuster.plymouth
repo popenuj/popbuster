@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Popbuster
+Description=Animated Popbuster boot splash
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/popbuster
+ScriptFile=/usr/share/plymouth/themes/popbuster/popbuster.script

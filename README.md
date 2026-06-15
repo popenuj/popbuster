@@ -188,7 +188,16 @@ The installed unit lives at `~/.config/systemd/user/popbuster.service`. It runs 
 
 ### Plymouth Boot Splash
 
-Popbuster includes a Plymouth theme for the early boot splash. The current theme intentionally holds a single frame until the OS hands off to the desktop session and Popbuster autostarts. This is a stability baseline before reintroducing animated frame sequences.
+The current stable boot splash uses Plymouth's stock `spinner` theme:
+
+```bash
+sudo plymouth-set-default-theme -R spinner
+sudo reboot
+```
+
+The Pi 5 boots quickly enough that this is a reasonable prototype baseline, and it avoids Plymouth/display handoff flicker while Popbuster is still running inside the desktop session.
+
+Popbuster also includes an experimental custom Plymouth theme. It currently holds a single frame until the OS hands off to the desktop session and Popbuster autostarts. In testing, Plymouth could briefly show the frame, go black during display handoff, show it again, then hand off to the desktop. Keep it as an experiment until kiosk-session work is stable.
 
 Bundled splash sequences:
 

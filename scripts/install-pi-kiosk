@@ -56,12 +56,12 @@ header_size = 16
 file_version = 0x00010000
 toc_count = 1
 image_type = 0xFFFD0002
-image_size = 1
+image_size = 24
 image_position = 28
 chunk_header_size = 36
 chunk_version = 1
-width = 1
-height = 1
+width = 24
+height = 24
 xhot = 0
 yhot = 0
 delay = 0
@@ -84,7 +84,7 @@ with target.open("wb") as cursor:
             delay,
         )
     )
-    cursor.write(struct.pack("<I", transparent_argb))
+    cursor.write(struct.pack("<I", transparent_argb) * width * height)
 PY
 for cursor_name in default arrow top_left_arrow left_ptr_watch pointer hand; do
   ln -sf left_ptr "${CURSOR_THEME_DIR}/cursors/${cursor_name}"

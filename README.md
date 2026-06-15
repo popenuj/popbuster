@@ -213,6 +213,8 @@ Popbuster fullscreen
 
 A brief black screen with a blinking text cursor between Plymouth and Popbuster is the Linux virtual terminal showing during session handoff. It is separate from the mouse pointer inside Popbuster. If it becomes distracting, try hiding the kernel console cursor later with `vt.global_cursor_default=0` in `/boot/firmware/cmdline.txt`; keep that as a separate boot-polish experiment.
 
+The kiosk installer creates a transparent cursor theme at `~/.icons/popbuster-blank` and starts Cage with that cursor theme. This hides the compositor-level mouse pointer before Qt has a chance to draw Popbuster.
+
 If kiosk mode fails, recover over SSH:
 
 ```bash

@@ -8,6 +8,7 @@ WAYLAND_SESSION_TARGET="/usr/share/wayland-sessions/${SESSION_NAME}.desktop"
 LIGHTDM_CONF="/etc/lightdm/lightdm.conf.d/90-popbuster-kiosk.conf"
 LIGHTDM_MAIN_CONF="/etc/lightdm/lightdm.conf"
 LIGHTDM_MAIN_BACKUP="/etc/lightdm/lightdm.conf.before-popbuster-kiosk"
+CURSOR_THEME_DIR="${HOME}/.icons/popbuster-blank"
 
 if [[ ! -f "${SESSION_TEMPLATE}" ]]; then
   echo "Missing kiosk session template: ${SESSION_TEMPLATE}" >&2
@@ -21,6 +22,11 @@ if ! command -v cage >/dev/null 2>&1; then
   exit 1
 fi
 
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "python3 is required to install the blank cursor theme." >&2
+  exit 1
+fi
+
 tmp_session="$(mktemp)"
 trap 'rm -f "${tmp_session}"' EXIT
 
@@ -30,6 +36,59 @@ sudo mkdir -p /usr/share/wayland-sessions
 sudo cp "${tmp_session}" "${WAYLAND_SESSION_TARGET}"
 sudo chmod 0644 "${WAYLAND_SESSION_TARGET}"
 sudo rm -f "/usr/share/xsessions/${SESSION_NAME}.desktop"
+
+mkdir -p "${CURSOR_THEME_DIR}/cursors"
+cat > "${CURSOR_THEME_DIR}/index.theme" <<EOF
+[Icon Theme]
+Name=Popbuster Blank
+Comment=Transparent cursor theme for Popbuster kiosk mode
+EOF
+python3 - "${CURSOR_THEME_DIR}/cursors/left_ptr" <<'PY'
+from pathlib import Path
+import struct
+import sys
+
+target = Path(sys.argv[1])
+target.parent.mkdir(parents=True, exist_ok=True)
+
+magic = 0x72756358
+header_size = 16
+file_version = 0x00010000
+toc_count = 1
+image_type = 0xFFFD0002
+image_size = 1
+image_position = 28
+chunk_header_size = 36
+chunk_version = 1
+width = 1
+height = 1
+xhot = 0
+yhot = 0
+delay = 0
+transparent_argb = 0
+
+with target.open("wb") as cursor:
+    cursor.write(struct.pack("<IIII", magic, header_size, file_version, toc_count))
+    cursor.write(struct.pack("<III", image_type, image_size, image_position))
+    cursor.write(
+        struct.pack(
+            "<IIIIIIIII",
+            chunk_header_size,
+            image_type,
+            image_size,
+            chunk_version,
+            width,
+            height,
+            xhot,
+            yhot,
+            delay,
+        )
+    )
+    cursor.write(struct.pack("<I", transparent_argb))
+PY
+for cursor_name in default arrow top_left_arrow left_ptr_watch pointer hand; do
+  ln -sf left_ptr "${CURSOR_THEME_DIR}/cursors/${cursor_name}"
+done
 
 sudo mkdir -p /etc/lightdm/lightdm.conf.d
 sudo tee "${LIGHTDM_CONF}" >/dev/null <<EOF
@@ -59,6 +118,9 @@ Session files:
 
 LightDM main config backup:
   ${LIGHTDM_MAIN_BACKUP}
+
+Blank cursor theme:
+  ${CURSOR_THEME_DIR}
 
 Next reboot should skip the normal desktop and start Popbuster through cage:
   sudo reboot

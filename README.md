@@ -128,6 +128,12 @@ assets/videos/test_video.mp4
 
 Then update `assets/tapes.json`.
 
+Pi playback is most reliable with 800x480 H.264 MP4 files. Normalize generated or captured clips before adding them:
+
+```bash
+scripts/transcode-video input.mov assets/videos/test_video.mp4
+```
+
 ## Commercials
 
 Future AI-generated Barbie-style commercials should be treated as local video assets, separate from tapes and bumpers. This slice reserves `assets/commercials/` for that content and persists a config flag:

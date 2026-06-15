@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export PYTHONPATH="${PROJECT_ROOT}/src${PYTHONPATH:+:${PYTHONPATH}}"
+
+PYTHON_BIN="${PROJECT_ROOT}/.venv/bin/python"
+if [[ ! -x "${PYTHON_BIN}" ]]; then
+  PYTHON_BIN="python3"
+fi
+
+"${PYTHON_BIN}" - "${PROJECT_ROOT}" <<'PY'
+from pathlib import Path
+import sys
+
+import yaml
+
+from popbuster.catalog import TapeCatalog
+
+project_root = Path(sys.argv[1])
+library_dir = project_root / "assets" / "library"
+catalog = TapeCatalog.from_library(library_dir)
+videos = catalog.available()
+
+print(f"Loaded {len(videos)} available video(s).")
+for video in videos:
+    print(f"- {video.id}: {video.title} [{video.video_path}]")
+
+print()
+print("Filter categories:")
+for category in catalog.filter_categories():
+    values = ", ".join(f"{value.title} ({value.count})" for value in category.values)
+    print(f"- {category.title}: {values}")
+
+print()
+print("Tape filters:")
+raw_tapes = yaml.safe_load((library_dir / "tapes.yml").read_text(encoding="utf-8")) or {}
+for raw_tape in raw_tapes.get("tapes", []):
+    tape_id = raw_tape["id"]
+    queue = catalog.queue_for_tape(tape_id)
+    print(f"- {tape_id}: {len(queue)} video(s)")
+PY

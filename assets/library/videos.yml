@@ -1,0 +1,22 @@
+videos:
+  - id: christmas_1995_lake_oswego_papa_betty_buddy
+    title: Christmas 1995 at Lake Oswego
+    media_type: home_video
+    collection: Family Movies
+    date: 1995-12-25
+    year: 1995
+    people:
+      - papa
+      - betty
+    pets:
+      - buddy
+    locations:
+      - lake_oswego_house
+    occasions:
+      - christmas
+    tags:
+      - vhs
+      - digitized
+      - test_clip
+    duration: 00:00:03
+    file: videos/test_video.mp4

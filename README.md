@@ -21,7 +21,7 @@ The current slice is intentionally small:
 The smallest sensible shape is:
 
 - `popbuster.app`: appliance state machine and user actions
-- `popbuster.catalog`: loads tape definitions from local JSON
+- `popbuster.catalog`: loads the YAML media library, tape filters, and filter menus
 - `popbuster.config`: loads and saves appliance settings
 - `popbuster.resume`: stores playback positions
 - `popbuster.ports`: protocols for display/video/hardware-facing adapters
@@ -397,9 +397,66 @@ sudo reboot
 
 The installer copies the selected sequence into `/usr/share/plymouth/themes/popbuster`, sets it as the default Plymouth theme, and rebuilds the boot image with `plymouth-set-default-theme -R popbuster`. The static theme displays the selected sequence's first frame. Plymouth starts after the earliest firmware/kernel phase, so a tiny amount of Raspberry Pi boot output may still appear before the custom splash. The brief desktop flash is handled separately by the future kiosk-session work.
 
-## Video
+## Media Library
 
-The default tape catalog points at `../Content/Movies/ML_tut_area2.mp4` when running inside the current workspace, so this prototype has a local video to play immediately.
+Popbuster's media library lives in YAML files under `assets/library/`. These files are the source of truth for future tapes, menus, and filter-based playback.
+
+```text
+assets/library/videos.yml
+assets/library/tapes.yml
+assets/library/people.yml
+assets/library/locations.yml
+assets/library/pets.yml
+```
+
+`videos.yml` contains the actual clips. Add one record per edited clip:
+
+```yaml
+videos:
+  - id: christmas_1995_lake_oswego_papa_betty_buddy
+    title: Christmas 1995 at Lake Oswego
+    media_type: home_video
+    collection: Family Movies
+    date: 1995-12-25
+    year: 1995
+    people: [papa, betty]
+    pets: [buddy]
+    locations: [lake_oswego_house]
+    occasions: [christmas]
+    tags: [vhs, digitized]
+    duration: 00:00:03
+    file: videos/test_video.mp4
+```
+
+Use stable lowercase ids with underscores for people, pets, locations, occasions, and tags. The lookup files provide display names for menus:
+
+```yaml
+people:
+  papa:
+    display_name: Papa
+```
+
+`tapes.yml` defines curated physical tapes as filters over `videos.yml`:
+
+```yaml
+tapes:
+  - id: christmas
+    title: Christmas Tape
+    rfid_payload: popbuster:tape:christmas
+    filters:
+      media_type: [home_video]
+      occasions: [christmas]
+```
+
+The current app still has a compatibility fallback for `assets/tapes.json`, but new clips should go into `assets/library/videos.yml`.
+
+After editing the library, validate it from the project root:
+
+```bash
+scripts/validate-library
+```
+
+## Video
 
 For current development, the simulated DSI and HDMI windows mirror the same feed. At application startup, Popbuster plays `assets/videos/app_start.mp4` before the text boot/loading sequence when the opening jingle setting is on. If that file is missing or the setting is off, the app skips directly to the text boot sequence.
 
@@ -409,7 +466,7 @@ For a real Popbuster test clip, place a video at:
 assets/videos/test_video.mp4
 ```
 
-Then update `assets/tapes.json`.
+Then add or update its record in `assets/library/videos.yml`.
 
 Pi playback is most reliable with 800x480 H.264 MP4 files. The app decodes videos with QtMultimedia, then renders decoded frames into normal Qt image widgets instead of using `QVideoWidget`; this has been more reliable on the Pi DSI/Wayland path. Normalize generated or captured clips before adding them:
 
@@ -455,7 +512,7 @@ Focus either Popbuster window and use:
 2. Define hardware-facing protocols before writing adapters.
 3. Implement a small appliance controller with states: boot, idle, bumper, playing, paused.
 4. Implement a Qt desktop adapter with two windows.
-5. Load a JSON tape catalog and resolve local video paths.
+5. Load the YAML media library and resolve local video paths.
 6. Save resume positions in `~/.popbuster/resume_positions.json`.
 7. Document setup, controls, and future hardware replacement points.
 

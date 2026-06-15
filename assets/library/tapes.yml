@@ -1,0 +1,27 @@
+tapes:
+  - id: christmas
+    title: Christmas Tape
+    rfid_payload: popbuster:tape:christmas
+    filters:
+      media_type:
+        - home_video
+      occasions:
+        - christmas
+
+  - id: christmas_1995
+    title: Christmas 1995
+    rfid_payload: popbuster:tape:christmas_1995
+    filters:
+      media_type:
+        - home_video
+      occasions:
+        - christmas
+      year:
+        - 1995
+
+  - id: buddy
+    title: Buddy Tape
+    rfid_payload: popbuster:tape:buddy
+    filters:
+      pets:
+        - buddy

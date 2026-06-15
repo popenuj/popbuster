@@ -25,6 +25,7 @@ from popbuster.resume import ResumeStore
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 CATALOG_PATH = PROJECT_ROOT / "assets" / "tapes.json"
+LIBRARY_DIR = PROJECT_ROOT / "assets" / "library"
 FONT_PATH = PROJECT_ROOT / "assets" / "fonts" / "Modeseven-L3n5.ttf"
 APP_START_VIDEO_PATH = PROJECT_ROOT / "assets" / "videos" / "app_start.mp4"
 STATE_DIR = Path(os.environ.get("POPBUSTER_STATE_DIR", Path.home() / ".popbuster"))
@@ -263,6 +264,13 @@ class QtDisplayVideoAdapter:
         )
         self.show_status("\n".join(("Video filters", *rows)))
 
+    def show_video_filter_values(self, items: tuple[str, ...], selected_index: int) -> None:
+        rows = tuple(
+            f"{'>' if index == selected_index else ' '} {item}"
+            for index, item in enumerate(items)
+        )
+        self.show_status("\n".join(("Select filter", *rows)))
+
     def load(self, path: Path) -> None:
         source = QUrl.fromLocalFile(str(path))
         self.player.setSource(source)
@@ -315,7 +323,7 @@ class DesktopApp:
         )
         self.playing_app_start_video = False
         self.controller = PopbusterController(
-            catalog=TapeCatalog.from_json(CATALOG_PATH),
+            catalog=load_catalog(),
             resume_store=ResumeStore(RESUME_PATH),
             config_store=ConfigStore(CONFIG_PATH),
             display=self.adapter,
@@ -396,20 +404,33 @@ class DesktopApp:
         elif key == Qt.Key.Key_Left:
             if self.controller.state == ApplianceState.SETTINGS:
                 self.controller.adjust_selected_setting(-1)
-            elif self.controller.state in {ApplianceState.MENU, ApplianceState.VIDEO_FILTERS}:
+            elif self.controller.state in {
+                ApplianceState.MENU,
+                ApplianceState.VIDEO_FILTERS,
+                ApplianceState.FILTER_VALUES,
+            }:
                 self.controller.close_menu()
         elif key == Qt.Key.Key_Right:
             if self.controller.state == ApplianceState.SETTINGS:
                 self.controller.adjust_selected_setting(1)
-            elif self.controller.state in {ApplianceState.MENU, ApplianceState.VIDEO_FILTERS}:
+            elif self.controller.state in {
+                ApplianceState.MENU,
+                ApplianceState.VIDEO_FILTERS,
+                ApplianceState.FILTER_VALUES,
+            }:
                 self.controller.activate_menu_selection()
+                if self.controller.state == ApplianceState.BUMPER:
+                    self.bumper_timer.start()
         elif key == Qt.Key.Key_Space:
             if self.controller.state in {
                 ApplianceState.MENU,
                 ApplianceState.SETTINGS,
                 ApplianceState.VIDEO_FILTERS,
+                ApplianceState.FILTER_VALUES,
             }:
                 self.controller.activate_menu_selection()
+                if self.controller.state == ApplianceState.BUMPER:
+                    self.bumper_timer.start()
             elif self.controller.current_tape is None:
                 self.controller.start_shuffle_playback()
                 if self.controller.current_tape is not None:
@@ -453,6 +474,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Use one display window instead of the mirrored development pair.",
     )
     return parser.parse_args(argv)
+
+
+def load_catalog() -> TapeCatalog:
+    if (LIBRARY_DIR / "videos.yml").exists():
+        return TapeCatalog.from_library(LIBRARY_DIR)
+    return TapeCatalog.from_json(CATALOG_PATH)
 
 
 def run(argv: list[str] | None = None) -> int:

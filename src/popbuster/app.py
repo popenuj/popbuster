@@ -18,6 +18,7 @@ class ApplianceState(Enum):
     MENU = auto()
     SETTINGS = auto()
     VIDEO_FILTERS = auto()
+    FILTER_VALUES = auto()
     ERROR = auto()
 
 
@@ -33,7 +34,6 @@ SETTINGS_COUNT = 2
 OPENING_JINGLE_SETTING = 0
 COMMERCIALS_SETTING = 1
 MENU_ITEMS = ("Settings", "Video filters")
-FILTER_CATEGORIES = ("People", "Places", "Media type", "Occasion", "Year")
 
 
 class PopbusterController:
@@ -58,6 +58,7 @@ class PopbusterController:
         self.selected_menu_item = 0
         self.selected_setting = 0
         self.selected_filter_category = 0
+        self.selected_filter_value = 0
 
     def boot_message(self, index: int) -> bool:
         if index >= len(BOOT_MESSAGES):
@@ -78,18 +79,12 @@ class PopbusterController:
         if self.state not in {ApplianceState.IDLE, ApplianceState.ERROR}:
             return
 
-        tape = self.catalog.get(tape_id)
-        if tape is None:
+        queue = self.catalog.queue_for_tape(tape_id)
+        if not queue:
             self._error(f"UNKNOWN TAPE: {tape_id}")
             return
-        if not tape.video_path.exists():
-            self._error(f"VIDEO NOT FOUND: {tape.video_path}")
-            return
 
-        self.current_tape = tape
-        self.playback_queue = []
-        self.state = ApplianceState.BUMPER
-        self.display.show_bumper()
+        self._start_queue(queue)
 
     def start_shuffle_playback(self) -> None:
         if self.state not in {ApplianceState.IDLE, ApplianceState.ERROR}:
@@ -101,10 +96,7 @@ class PopbusterController:
             return
 
         random.shuffle(tapes)
-        self.current_tape = tapes[0]
-        self.playback_queue = tapes[1:]
-        self.state = ApplianceState.BUMPER
-        self.display.show_bumper()
+        self._start_queue(tapes)
 
     def bumper_finished(self) -> None:
         if self.state != ApplianceState.BUMPER or self.current_tape is None:
@@ -144,7 +136,15 @@ class PopbusterController:
             ApplianceState.MENU,
             ApplianceState.SETTINGS,
             ApplianceState.VIDEO_FILTERS,
+            ApplianceState.FILTER_VALUES,
         }:
+            return
+        if self.state == ApplianceState.FILTER_VALUES:
+            self.state = ApplianceState.VIDEO_FILTERS
+            self.display.show_video_filters(
+                self._filter_category_titles() or ("No filters found",),
+                self.selected_filter_category,
+            )
             return
         if self.state in {ApplianceState.SETTINGS, ApplianceState.VIDEO_FILTERS}:
             self.state = ApplianceState.MENU
@@ -186,10 +186,21 @@ class PopbusterController:
         elif self.state == ApplianceState.SETTINGS:
             self.move_settings_selection(direction)
         elif self.state == ApplianceState.VIDEO_FILTERS:
+            filter_categories = self._filter_category_titles()
+            if not filter_categories:
+                self.display.show_video_filters(("No filters found",), 0)
+                return
             self.selected_filter_category = (
                 self.selected_filter_category + direction
-            ) % len(FILTER_CATEGORIES)
-            self.display.show_video_filters(FILTER_CATEGORIES, self.selected_filter_category)
+            ) % len(filter_categories)
+            self.display.show_video_filters(filter_categories, self.selected_filter_category)
+        elif self.state == ApplianceState.FILTER_VALUES:
+            values = self._selected_filter_values()
+            if not values:
+                self.display.show_video_filter_values(("No values found",), 0)
+                return
+            self.selected_filter_value = (self.selected_filter_value + direction) % len(values)
+            self.display.show_video_filter_values(values, self.selected_filter_value)
 
     def activate_menu_selection(self) -> None:
         if self.state == ApplianceState.MENU:
@@ -198,7 +209,36 @@ class PopbusterController:
                 self.display.show_settings(self.config, self.selected_setting)
             elif self.selected_menu_item == 1:
                 self.state = ApplianceState.VIDEO_FILTERS
-                self.display.show_video_filters(FILTER_CATEGORIES, self.selected_filter_category)
+                filter_categories = self._filter_category_titles()
+                self.selected_filter_category = min(
+                    self.selected_filter_category,
+                    max(0, len(filter_categories) - 1),
+                )
+                self.display.show_video_filters(
+                    filter_categories or ("No filters found",),
+                    self.selected_filter_category,
+                )
+        elif self.state == ApplianceState.VIDEO_FILTERS:
+            categories = self.catalog.filter_categories()
+            if not categories:
+                self.display.show_video_filters(("No filters found",), 0)
+                return
+            self.selected_filter_category = min(
+                self.selected_filter_category,
+                len(categories) - 1,
+            )
+            self.selected_filter_value = 0
+            self.state = ApplianceState.FILTER_VALUES
+            self.display.show_video_filter_values(
+                self._selected_filter_values() or ("No values found",),
+                self.selected_filter_value,
+            )
+        elif self.state == ApplianceState.FILTER_VALUES:
+            queue = self._queue_for_selected_filter_value()
+            if not queue:
+                self._error("NO VIDEOS FOUND")
+                return
+            self._start_queue(queue)
         elif self.state == ApplianceState.SETTINGS:
             self.adjust_selected_setting(1)
 
@@ -217,6 +257,7 @@ class PopbusterController:
             ApplianceState.MENU,
             ApplianceState.SETTINGS,
             ApplianceState.VIDEO_FILTERS,
+            ApplianceState.FILTER_VALUES,
         }:
             self.close_menu()
             return
@@ -247,3 +288,29 @@ class PopbusterController:
     def _error(self, message: str) -> None:
         self.state = ApplianceState.ERROR
         self.display.show_error(message)
+
+    def _filter_category_titles(self) -> tuple[str, ...]:
+        return tuple(category.title for category in self.catalog.filter_categories())
+
+    def _selected_filter_values(self) -> tuple[str, ...]:
+        categories = self.catalog.filter_categories()
+        if not categories:
+            return ()
+        category = categories[self.selected_filter_category]
+        return tuple(f"{value.title} ({value.count})" for value in category.values)
+
+    def _queue_for_selected_filter_value(self) -> list[Tape]:
+        categories = self.catalog.filter_categories()
+        if not categories:
+            return []
+        category = categories[self.selected_filter_category]
+        if not category.values:
+            return []
+        value = category.values[self.selected_filter_value]
+        return self.catalog.filter_videos({category.id: (value.id,)})
+
+    def _start_queue(self, queue: list[Tape]) -> None:
+        self.current_tape = queue[0]
+        self.playback_queue = queue[1:]
+        self.state = ApplianceState.BUMPER
+        self.display.show_bumper()

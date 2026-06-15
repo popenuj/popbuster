@@ -57,6 +57,12 @@ def appliance_font(size: int, bold: bool = False) -> QFont:
     return font
 
 
+def transparent_cursor() -> QCursor:
+    pixmap = QPixmap(1, 1)
+    pixmap.fill(Qt.GlobalColor.transparent)
+    return QCursor(pixmap)
+
+
 class KeyWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
@@ -279,7 +285,7 @@ class DesktopApp:
         register_application_fonts()
         self.fullscreen = fullscreen
         self.single_display = single_display
-        self.blank_cursor = QCursor(Qt.CursorShape.BlankCursor)
+        self.blank_cursor = transparent_cursor()
         if self.fullscreen:
             self.qt.setOverrideCursor(self.blank_cursor)
 
@@ -330,10 +336,10 @@ class DesktopApp:
         return self.qt.exec()
 
     def _hide_cursor(self) -> None:
-        self.output.setCursor(self.blank_cursor)
-        self.output.centralWidget().setCursor(self.blank_cursor)
-        self.internal.setCursor(self.blank_cursor)
-        self.internal.centralWidget().setCursor(self.blank_cursor)
+        for window in (self.output, self.internal):
+            window.setCursor(self.blank_cursor)
+            for widget in window.findChildren(QWidget):
+                widget.setCursor(self.blank_cursor)
 
     def _start_app_intro(self) -> None:
         if (

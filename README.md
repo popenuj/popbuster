@@ -444,7 +444,7 @@ Focus either Popbuster window and use:
 | `M` | Open settings |
 | `Up` / `Down` | Move settings selection |
 | `Left` / `Right` | Change selected setting immediately |
-| `Space` | Play/pause |
+| `Space` | Play/pause; from `INSERT TAPE`, start shuffled local playback |
 | `E`, `Backspace`, or `Escape` | Eject/back |
 | `Q` | Quit |
 

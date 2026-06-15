@@ -384,7 +384,12 @@ class DesktopApp:
         elif key == Qt.Key.Key_Right:
             self.controller.adjust_selected_setting(1)
         elif key == Qt.Key.Key_Space:
-            self.controller.toggle_play_pause()
+            if self.controller.current_tape is None:
+                self.controller.start_shuffle_playback()
+                if self.controller.current_tape is not None:
+                    self.bumper_timer.start()
+            else:
+                self.controller.toggle_play_pause()
         elif key in (Qt.Key.Key_E, Qt.Key.Key_Backspace, Qt.Key.Key_Escape):
             self.bumper_timer.stop()
             self.controller.eject()

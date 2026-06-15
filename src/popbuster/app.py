@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import random
 from enum import Enum, auto
 
 from popbuster.catalog import Tape, TapeCatalog
@@ -48,6 +49,7 @@ class PopbusterController:
         self.video = video
         self.state = ApplianceState.BOOTING
         self.current_tape: Tape | None = None
+        self.playback_queue: list[Tape] = []
         self.previous_state = ApplianceState.IDLE
         self.selected_setting = 0
 
@@ -79,6 +81,22 @@ class PopbusterController:
             return
 
         self.current_tape = tape
+        self.playback_queue = []
+        self.state = ApplianceState.BUMPER
+        self.display.show_bumper()
+
+    def start_shuffle_playback(self) -> None:
+        if self.state not in {ApplianceState.IDLE, ApplianceState.ERROR}:
+            return
+
+        tapes = self.catalog.available()
+        if not tapes:
+            self._error("NO LOCAL VIDEOS FOUND")
+            return
+
+        random.shuffle(tapes)
+        self.current_tape = tapes[0]
+        self.playback_queue = tapes[1:]
         self.state = ApplianceState.BUMPER
         self.display.show_bumper()
 
@@ -165,14 +183,23 @@ class PopbusterController:
             self.resume_store.save_ms(self.current_tape.id, self.video.position_ms())
         self.video.stop()
         self.current_tape = None
+        self.playback_queue = []
         self.state = ApplianceState.IDLE
         self.display.show_idle()
 
     def playback_finished(self) -> None:
         if self.current_tape is not None:
             self.resume_store.clear(self.current_tape.id)
+        if self.playback_queue:
+            self.current_tape = self.playback_queue.pop(0)
+            self.video.load(self.current_tape.video_path)
+            self.video.play()
+            self.state = ApplianceState.PLAYING
+            self.display.show_playing(self.current_tape, resumed=False)
+            return
         self.video.stop()
         self.current_tape = None
+        self.playback_queue = []
         self.state = ApplianceState.IDLE
         self.display.show_idle()
 

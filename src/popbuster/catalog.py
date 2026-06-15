@@ -45,3 +45,6 @@ class TapeCatalog:
             if tape.video_path.exists():
                 return tape
         return next(iter(self._tapes.values()), None)
+
+    def available(self) -> list[Tape]:
+        return [tape for tape in self._tapes.values() if tape.video_path.exists()]

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROJECT_ROOT="${POPBUSTER_PROJECT_ROOT:-${HOME}/popbuster}"
+
+if ! command -v cage >/dev/null 2>&1; then
+  echo "cage is required for Popbuster kiosk mode." >&2
+  echo "Install it on the Pi with: sudo apt install cage" >&2
+  exit 1
+fi
+
+export POPBUSTER_FULLSCREEN="${POPBUSTER_FULLSCREEN:-1}"
+export POPBUSTER_SINGLE_DISPLAY="${POPBUSTER_SINGLE_DISPLAY:-1}"
+
+cd "${PROJECT_ROOT}"
+exec cage -- "${PROJECT_ROOT}/scripts/run-pi"

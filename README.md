@@ -186,6 +186,47 @@ systemctl --user disable popbuster.service
 
 The installed unit lives at `~/.config/systemd/user/popbuster.service`. It runs `scripts/run-pi`, so the same `POPBUSTER_FULLSCREEN`, `POPBUSTER_SINGLE_DISPLAY`, and `WAYLAND_DISPLAY` overrides still apply through the service file.
 
+### Pi Kiosk Session
+
+Kiosk mode is an experiment to remove the brief desktop flash before Popbuster launches. It uses `cage`, a small Wayland kiosk compositor, and configures LightDM autologin to start a `popbuster-kiosk` session instead of the normal desktop. The regular desktop is not deleted.
+
+Install the compositor dependency on the Pi:
+
+```bash
+sudo apt install cage
+```
+
+After deploying Popbuster, install kiosk mode:
+
+```bash
+cd /home/johnp/popbuster
+scripts/install-pi-kiosk
+sudo reboot
+```
+
+Expected boot path:
+
+```text
+Plymouth spinner
+Popbuster fullscreen
+```
+
+If kiosk mode fails, recover over SSH:
+
+```bash
+ssh johnp@192.168.0.18
+cd ~/popbuster
+scripts/restore-pi-desktop
+sudo reboot
+```
+
+After returning to the normal desktop, reinstall desktop-session autostart if desired:
+
+```bash
+cd ~/popbuster
+scripts/install-pi-autostart
+```
+
 ### Plymouth Boot Splash
 
 The current stable boot splash uses Plymouth's stock `spinner` theme:

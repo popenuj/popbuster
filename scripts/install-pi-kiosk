@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROJECT_ROOT="${POPBUSTER_PROJECT_ROOT:-${HOME}/popbuster}"
+SESSION_NAME="popbuster-kiosk"
+SESSION_TEMPLATE="${PROJECT_ROOT}/support/lightdm/${SESSION_NAME}.desktop.in"
+SESSION_TARGET="/usr/share/wayland-sessions/${SESSION_NAME}.desktop"
+LIGHTDM_CONF="/etc/lightdm/lightdm.conf.d/90-popbuster-kiosk.conf"
+
+if [[ ! -f "${SESSION_TEMPLATE}" ]]; then
+  echo "Missing kiosk session template: ${SESSION_TEMPLATE}" >&2
+  echo "Run this script from a deployed Popbuster checkout on the Pi." >&2
+  exit 1
+fi
+
+if ! command -v cage >/dev/null 2>&1; then
+  echo "cage is required for Popbuster kiosk mode." >&2
+  echo "Install it first with: sudo apt install cage" >&2
+  exit 1
+fi
+
+tmp_session="$(mktemp)"
+trap 'rm -f "${tmp_session}"' EXIT
+
+sed "s|@PROJECT_ROOT@|${PROJECT_ROOT}|g" "${SESSION_TEMPLATE}" > "${tmp_session}"
+
+sudo mkdir -p /usr/share/wayland-sessions
+sudo cp "${tmp_session}" "${SESSION_TARGET}"
+
+sudo mkdir -p /etc/lightdm/lightdm.conf.d
+sudo tee "${LIGHTDM_CONF}" >/dev/null <<EOF
+[Seat:*]
+autologin-user=${USER}
+autologin-session=${SESSION_NAME}
+user-session=${SESSION_NAME}
+EOF
+
+systemctl --user disable --now popbuster.service >/dev/null 2>&1 || true
+
+cat <<EOF
+Installed Popbuster kiosk session.
+
+Next reboot should skip the normal desktop and start Popbuster through cage:
+  sudo reboot
+
+Recovery over SSH:
+  cd ${PROJECT_ROOT}
+  scripts/restore-pi-desktop
+  sudo reboot
+EOF

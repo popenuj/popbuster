@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SESSION_TARGET="/usr/share/wayland-sessions/popbuster-kiosk.desktop"
+LIGHTDM_CONF="/etc/lightdm/lightdm.conf.d/90-popbuster-kiosk.conf"
+
+sudo rm -f "${LIGHTDM_CONF}"
+sudo rm -f "${SESSION_TARGET}"
+
+cat <<EOF
+Removed Popbuster kiosk session configuration.
+
+Reboot to return to the normal desktop session:
+  sudo reboot
+
+To return to desktop autostart mode after reboot:
+  cd ~/popbuster
+  scripts/install-pi-autostart
+EOF

@@ -35,9 +35,15 @@ exec "${PROJECT_ROOT}/scripts/run-pi"
 EOF
 chmod +x "${LABWC_CONFIG_DIR}/autostart"
 
-cat > "${LABWC_CONFIG_DIR}/rc.xml" <<'EOF'
+cat > "${LABWC_CONFIG_DIR}/rc.xml" <<EOF
 <?xml version="1.0"?>
 <openbox_config xmlns="http://openbox.org/3.4/rc">
+  <core>
+    <cursor>
+      <theme>${XCURSOR_THEME}</theme>
+      <size>${XCURSOR_SIZE}</size>
+    </cursor>
+  </core>
   <keyboard>
     <default />
   </keyboard>

@@ -7,8 +7,7 @@ from pathlib import Path
 
 from PySide6.QtCore import QTimer, Qt, QUrl
 from PySide6.QtGui import QCursor, QFont, QFontDatabase, QKeyEvent, QPixmap
-from PySide6.QtMultimedia import QAudioOutput, QMediaPlayer
-from PySide6.QtMultimediaWidgets import QVideoWidget
+from PySide6.QtMultimedia import QAudioOutput, QMediaPlayer, QVideoFrame, QVideoSink
 from PySide6.QtWidgets import (
     QApplication,
     QLabel,
@@ -92,13 +91,8 @@ class OutputWindow(KeyWindow):
         self.image = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
         self.image.setStyleSheet("background: #000;")
 
-        self.video = QVideoWidget()
-        self.video.setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
-        self.video.setStyleSheet("background: #000;")
-
         self.stack.addWidget(self.message)
         self.stack.addWidget(self.image)
-        self.stack.addWidget(self.video)
         self.setCentralWidget(self.stack)
 
     def show_message(self, text: str, blue: bool = False) -> None:
@@ -110,7 +104,7 @@ class OutputWindow(KeyWindow):
         self.stack.setCurrentWidget(self.message)
 
     def show_video(self) -> None:
-        self.stack.setCurrentWidget(self.video)
+        self.stack.setCurrentWidget(self.image)
 
     def show_image(self, pixmap: QPixmap) -> None:
         self.current_image = pixmap
@@ -149,12 +143,8 @@ class InternalWindow(KeyWindow):
         self.image = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
         self.image.setStyleSheet("background: #000;")
 
-        self.video = QVideoWidget()
-        self.video.setStyleSheet("background: #000;")
-
         self.stack.addWidget(self.logo)
         self.stack.addWidget(self.image)
-        self.stack.addWidget(self.video)
 
         root = QWidget()
         layout = QVBoxLayout()
@@ -170,7 +160,7 @@ class InternalWindow(KeyWindow):
         self.stack.setCurrentWidget(self.logo)
 
     def show_video(self) -> None:
-        self.stack.setCurrentWidget(self.video)
+        self.stack.setCurrentWidget(self.image)
 
     def show_image(self, pixmap: QPixmap) -> None:
         self.current_image = pixmap
@@ -205,18 +195,11 @@ class QtDisplayVideoAdapter:
         self.mirror_enabled = mirror_enabled
         self.player = QMediaPlayer()
         self.audio = QAudioOutput()
+        self.video_sink = QVideoSink()
         self.audio.setVolume(0.7)
         self.player.setAudioOutput(self.audio)
-        self.player.setVideoOutput(self.output.video)
-
-        self.mirror_player: QMediaPlayer | None = None
-        self.mirror_audio: QAudioOutput | None = None
-        if self.mirror_enabled:
-            self.mirror_player = QMediaPlayer()
-            self.mirror_audio = QAudioOutput()
-            self.mirror_audio.setVolume(0.0)
-            self.mirror_player.setAudioOutput(self.mirror_audio)
-            self.mirror_player.setVideoOutput(self.internal.video)
+        self.player.setVideoSink(self.video_sink)
+        self.video_sink.videoFrameChanged.connect(self._video_frame_changed)
 
     def show_boot(self, message: str) -> None:
         self.output.show_message(message)
@@ -265,31 +248,31 @@ class QtDisplayVideoAdapter:
     def load(self, path: Path) -> None:
         source = QUrl.fromLocalFile(str(path))
         self.player.setSource(source)
-        if self.mirror_player is not None:
-            self.mirror_player.setSource(source)
 
     def play(self) -> None:
         self.player.play()
-        if self.mirror_player is not None:
-            self.mirror_player.play()
 
     def pause(self) -> None:
         self.player.pause()
-        if self.mirror_player is not None:
-            self.mirror_player.pause()
 
     def stop(self) -> None:
         self.player.stop()
-        if self.mirror_player is not None:
-            self.mirror_player.stop()
 
     def seek_ms(self, position_ms: int) -> None:
         self.player.setPosition(position_ms)
-        if self.mirror_player is not None:
-            self.mirror_player.setPosition(position_ms)
 
     def position_ms(self) -> int:
         return self.player.position()
+
+    def _video_frame_changed(self, frame: QVideoFrame) -> None:
+        image = frame.toImage()
+        if image.isNull():
+            return
+
+        pixmap = QPixmap.fromImage(image)
+        self.output.show_image(pixmap)
+        if self.mirror_enabled:
+            self.internal.show_image(pixmap)
 
 
 class DesktopApp:

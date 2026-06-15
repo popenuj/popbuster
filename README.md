@@ -135,7 +135,7 @@ assets/videos/test_video.mp4
 
 Then update `assets/tapes.json`.
 
-Pi playback is most reliable with 800x480 H.264 MP4 files. Normalize generated or captured clips before adding them:
+Pi playback is most reliable with 800x480 H.264 MP4 files. The app decodes videos with QtMultimedia, then renders decoded frames into normal Qt image widgets instead of using `QVideoWidget`; this has been more reliable on the Pi DSI/Wayland path. Normalize generated or captured clips before adding them:
 
 ```bash
 scripts/transcode-video input.mov assets/videos/test_video.mp4

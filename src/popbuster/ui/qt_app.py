@@ -279,8 +279,15 @@ class DesktopApp:
         register_application_fonts()
         self.fullscreen = fullscreen
         self.single_display = single_display
+        self.blank_cursor = QCursor(Qt.CursorShape.BlankCursor)
+        if self.fullscreen:
+            self.qt.setOverrideCursor(self.blank_cursor)
+
         self.output = OutputWindow(appliance_layout=self.single_display)
         self.internal = InternalWindow()
+        if self.fullscreen:
+            self._hide_cursor()
+
         self.adapter = QtDisplayVideoAdapter(
             self.output,
             self.internal,
@@ -312,7 +319,7 @@ class DesktopApp:
 
     def run(self) -> int:
         if self.fullscreen:
-            self.output.setCursor(QCursor(Qt.CursorShape.BlankCursor))
+            self._hide_cursor()
             self.output.showFullScreen()
         else:
             self.output.show()
@@ -321,6 +328,12 @@ class DesktopApp:
             self.internal.show()
         QTimer.singleShot(250, self._start_app_intro)
         return self.qt.exec()
+
+    def _hide_cursor(self) -> None:
+        self.output.setCursor(self.blank_cursor)
+        self.output.centralWidget().setCursor(self.blank_cursor)
+        self.internal.setCursor(self.blank_cursor)
+        self.internal.centralWidget().setCursor(self.blank_cursor)
 
     def _start_app_intro(self) -> None:
         if (

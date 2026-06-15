@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "popbuster"
+version = "0.1.0"
+description = "Desktop prototype for a Barbie-scale CRT-style home-video appliance."
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "PySide6>=6.7,<7",
+]
+
+[project.scripts]
+popbuster = "popbuster.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/popbuster"]

@@ -121,6 +121,42 @@ POPBUSTER_FULLSCREEN=0 POPBUSTER_SINGLE_DISPLAY=0 scripts/run-pi
 
 The default macOS/development mode still opens two mirrored windows. Pi mode uses one fullscreen window on the active 800x480 DSI display, hides the cursor, and uses tighter text padding for the smaller screen.
 
+### Pi DSI Display
+
+The Waveshare 4.3-inch 800x480 non-touch DSI display should be configured explicitly instead of relying on Raspberry Pi OS display auto-detection. Auto-detect worked intermittently after kernel/initramfs updates, and warm reboots could come back headless.
+
+Edit `/boot/firmware/config.txt` on the Pi:
+
+```bash
+sudo nano /boot/firmware/config.txt
+```
+
+Use this display section:
+
+```text
+# Automatically load overlays for detected DSI displays
+display_auto_detect=0
+
+# Automatically load initramfs files, if found
+auto_initramfs=1
+
+# Enable Waveshare 4.3" 800x480 non-touch DSI display on Pi DSI0
+dtoverlay=vc4-kms-dsi-waveshare-800x480,dsi0,disable_touch
+
+# Enable DRM VC4 V3D driver
+dtoverlay=vc4-kms-v3d
+max_framebuffers=2
+```
+
+After saving, reboot and verify that the desktop sees the real panel:
+
+```bash
+wlr-randr
+ls -la /sys/class/drm
+```
+
+Expected output includes an enabled `DSI` connector at `800x480`. If `wlr-randr` shows `NOOP-1 "Headless output"`, the OS is running but did not detect the display.
+
 ### Pi Autostart
 
 The current autostart path is a user-level systemd service that runs after the Pi desktop session starts. This assumes the Pi is configured to log into the desktop automatically, because Popbuster currently renders into that Wayland session.

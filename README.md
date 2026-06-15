@@ -441,9 +441,10 @@ Focus either Popbuster window and use:
 | Key | Action |
 | --- | --- |
 | `I` or `1` | Insert the demo tape |
-| `M` | Open settings |
-| `Up` / `Down` | Move settings selection |
-| `Left` / `Right` | Change selected setting immediately |
+| `M` | Open menu |
+| `Up` / `Down` | Move menu selection |
+| `Right` or `Space` | Enter menu item; in settings, change selected setting immediately |
+| `Left` | Back out of menu; in settings, change selected setting immediately |
 | `Space` | Play/pause; from `INSERT TAPE`, start shuffled local playback |
 | `E`, `Backspace`, or `Escape` | Eject/back |
 | `Q` | Quit |

@@ -17,7 +17,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from popbuster.app import PopbusterController
+from popbuster.app import ApplianceState, PopbusterController
 from popbuster.catalog import Tape, TapeCatalog
 from popbuster.config import AppConfig, ConfigStore
 from popbuster.resume import ResumeStore
@@ -233,6 +233,13 @@ class QtDisplayVideoAdapter:
         self.output.show_message(message)
         self.internal.show_status(message)
 
+    def show_main_menu(self, items: tuple[str, ...], selected_index: int) -> None:
+        rows = tuple(
+            f"{'>' if index == selected_index else ' '} {item}"
+            for index, item in enumerate(items)
+        )
+        self.show_status("\n".join(("Menu", *rows)))
+
     def show_settings(self, config: AppConfig, selected_index: int) -> None:
         commercials = "On" if config.commercials_enabled else "Off"
         opening_jingle = "On" if config.opening_jingle_enabled else "Off"
@@ -248,6 +255,13 @@ class QtDisplayVideoAdapter:
                 )
             )
         )
+
+    def show_video_filters(self, items: tuple[str, ...], selected_index: int) -> None:
+        rows = tuple(
+            f"{'>' if index == selected_index else ' '} {item}"
+            for index, item in enumerate(items)
+        )
+        self.show_status("\n".join(("Video filters", *rows)))
 
     def load(self, path: Path) -> None:
         source = QUrl.fromLocalFile(str(path))
@@ -374,17 +388,29 @@ class DesktopApp:
             if self.controller.current_tape is not None:
                 self.bumper_timer.start()
         elif key == Qt.Key.Key_M:
-            self.controller.open_settings()
+            self.controller.open_menu()
         elif key == Qt.Key.Key_Up:
-            self.controller.move_settings_selection(-1)
+            self.controller.move_menu_selection(-1)
         elif key == Qt.Key.Key_Down:
-            self.controller.move_settings_selection(1)
+            self.controller.move_menu_selection(1)
         elif key == Qt.Key.Key_Left:
-            self.controller.adjust_selected_setting(-1)
+            if self.controller.state == ApplianceState.SETTINGS:
+                self.controller.adjust_selected_setting(-1)
+            elif self.controller.state in {ApplianceState.MENU, ApplianceState.VIDEO_FILTERS}:
+                self.controller.close_menu()
         elif key == Qt.Key.Key_Right:
-            self.controller.adjust_selected_setting(1)
+            if self.controller.state == ApplianceState.SETTINGS:
+                self.controller.adjust_selected_setting(1)
+            elif self.controller.state in {ApplianceState.MENU, ApplianceState.VIDEO_FILTERS}:
+                self.controller.activate_menu_selection()
         elif key == Qt.Key.Key_Space:
-            if self.controller.current_tape is None:
+            if self.controller.state in {
+                ApplianceState.MENU,
+                ApplianceState.SETTINGS,
+                ApplianceState.VIDEO_FILTERS,
+            }:
+                self.controller.activate_menu_selection()
+            elif self.controller.current_tape is None:
                 self.controller.start_shuffle_playback()
                 if self.controller.current_tape is not None:
                     self.bumper_timer.start()

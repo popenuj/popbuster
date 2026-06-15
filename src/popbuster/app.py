@@ -15,7 +15,9 @@ class ApplianceState(Enum):
     BUMPER = auto()
     PLAYING = auto()
     PAUSED = auto()
+    MENU = auto()
     SETTINGS = auto()
+    VIDEO_FILTERS = auto()
     ERROR = auto()
 
 
@@ -30,6 +32,8 @@ BOOT_MESSAGES = (
 SETTINGS_COUNT = 2
 OPENING_JINGLE_SETTING = 0
 COMMERCIALS_SETTING = 1
+MENU_ITEMS = ("Settings", "Video filters")
+FILTER_CATEGORIES = ("People", "Places", "Media type", "Occasion", "Year")
 
 
 class PopbusterController:
@@ -51,7 +55,9 @@ class PopbusterController:
         self.current_tape: Tape | None = None
         self.playback_queue: list[Tape] = []
         self.previous_state = ApplianceState.IDLE
+        self.selected_menu_item = 0
         self.selected_setting = 0
+        self.selected_filter_category = 0
 
     def boot_message(self, index: int) -> bool:
         if index >= len(BOOT_MESSAGES):
@@ -126,15 +132,23 @@ class PopbusterController:
             self.state = ApplianceState.PLAYING
             self.display.show_playing(self.current_tape, resumed=True)
 
-    def open_settings(self) -> None:
+    def open_menu(self) -> None:
         if self.state not in {ApplianceState.IDLE, ApplianceState.PAUSED, ApplianceState.ERROR}:
             return
         self.previous_state = self.state
-        self.state = ApplianceState.SETTINGS
-        self.display.show_settings(self.config, self.selected_setting)
+        self.state = ApplianceState.MENU
+        self.display.show_main_menu(MENU_ITEMS, self.selected_menu_item)
 
-    def close_settings(self) -> None:
-        if self.state != ApplianceState.SETTINGS:
+    def close_menu(self) -> None:
+        if self.state not in {
+            ApplianceState.MENU,
+            ApplianceState.SETTINGS,
+            ApplianceState.VIDEO_FILTERS,
+        }:
+            return
+        if self.state in {ApplianceState.SETTINGS, ApplianceState.VIDEO_FILTERS}:
+            self.state = ApplianceState.MENU
+            self.display.show_main_menu(MENU_ITEMS, self.selected_menu_item)
             return
         self.state = self.previous_state
         if self.state == ApplianceState.PAUSED and self.current_tape is not None:
@@ -165,6 +179,29 @@ class PopbusterController:
         self.selected_setting = (self.selected_setting + direction) % SETTINGS_COUNT
         self.display.show_settings(self.config, self.selected_setting)
 
+    def move_menu_selection(self, direction: int) -> None:
+        if self.state == ApplianceState.MENU:
+            self.selected_menu_item = (self.selected_menu_item + direction) % len(MENU_ITEMS)
+            self.display.show_main_menu(MENU_ITEMS, self.selected_menu_item)
+        elif self.state == ApplianceState.SETTINGS:
+            self.move_settings_selection(direction)
+        elif self.state == ApplianceState.VIDEO_FILTERS:
+            self.selected_filter_category = (
+                self.selected_filter_category + direction
+            ) % len(FILTER_CATEGORIES)
+            self.display.show_video_filters(FILTER_CATEGORIES, self.selected_filter_category)
+
+    def activate_menu_selection(self) -> None:
+        if self.state == ApplianceState.MENU:
+            if self.selected_menu_item == 0:
+                self.state = ApplianceState.SETTINGS
+                self.display.show_settings(self.config, self.selected_setting)
+            elif self.selected_menu_item == 1:
+                self.state = ApplianceState.VIDEO_FILTERS
+                self.display.show_video_filters(FILTER_CATEGORIES, self.selected_filter_category)
+        elif self.state == ApplianceState.SETTINGS:
+            self.adjust_selected_setting(1)
+
     def adjust_selected_setting(self, direction: int) -> None:
         if self.state != ApplianceState.SETTINGS:
             return
@@ -176,8 +213,12 @@ class PopbusterController:
         self.display.show_settings(self.config, self.selected_setting)
 
     def eject(self) -> None:
-        if self.state == ApplianceState.SETTINGS:
-            self.close_settings()
+        if self.state in {
+            ApplianceState.MENU,
+            ApplianceState.SETTINGS,
+            ApplianceState.VIDEO_FILTERS,
+        }:
+            self.close_menu()
             return
         if self.current_tape is not None:
             self.resume_store.save_ms(self.current_tape.id, self.video.position_ms())

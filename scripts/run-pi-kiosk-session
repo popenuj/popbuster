@@ -2,10 +2,12 @@
 set -euo pipefail
 
 PROJECT_ROOT="${POPBUSTER_PROJECT_ROOT:-${HOME}/popbuster}"
+KIOSK_CONFIG_ROOT="${XDG_RUNTIME_DIR:-/tmp}/popbuster-labwc-config"
+LABWC_CONFIG_DIR="${KIOSK_CONFIG_ROOT}/labwc"
 
-if ! command -v cage >/dev/null 2>&1; then
-  echo "cage is required for Popbuster kiosk mode." >&2
-  echo "Install it on the Pi with: sudo apt install cage" >&2
+if ! command -v labwc >/dev/null 2>&1; then
+  echo "labwc is required for Popbuster kiosk mode." >&2
+  echo "Install it on the Pi with: sudo apt install labwc" >&2
   exit 1
 fi
 
@@ -16,5 +18,38 @@ export XCURSOR_PATH="${XCURSOR_PATH:-${HOME}/.icons:/usr/share/icons}"
 export XCURSOR_SIZE="${XCURSOR_SIZE:-24}"
 export WLR_NO_HARDWARE_CURSORS="${WLR_NO_HARDWARE_CURSORS:-1}"
 
+rm -rf "${KIOSK_CONFIG_ROOT}"
+mkdir -p "${LABWC_CONFIG_DIR}"
+
+cat > "${LABWC_CONFIG_DIR}/autostart" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+export POPBUSTER_FULLSCREEN="${POPBUSTER_FULLSCREEN}"
+export POPBUSTER_SINGLE_DISPLAY="${POPBUSTER_SINGLE_DISPLAY}"
+export XCURSOR_THEME="${XCURSOR_THEME}"
+export XCURSOR_PATH="${XCURSOR_PATH}"
+export XCURSOR_SIZE="${XCURSOR_SIZE}"
+export WLR_NO_HARDWARE_CURSORS="${WLR_NO_HARDWARE_CURSORS}"
 cd "${PROJECT_ROOT}"
-exec cage -- "${PROJECT_ROOT}/scripts/run-pi"
+exec "${PROJECT_ROOT}/scripts/run-pi"
+EOF
+chmod +x "${LABWC_CONFIG_DIR}/autostart"
+
+cat > "${LABWC_CONFIG_DIR}/rc.xml" <<'EOF'
+<?xml version="1.0"?>
+<openbox_config xmlns="http://openbox.org/3.4/rc">
+  <keyboard>
+    <default />
+  </keyboard>
+  <mouse>
+    <default />
+  </mouse>
+  <theme>
+    <name>Popbuster</name>
+  </theme>
+</openbox_config>
+EOF
+
+export XDG_CONFIG_HOME="${KIOSK_CONFIG_ROOT}"
+cd "${PROJECT_ROOT}"
+exec labwc

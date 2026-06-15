@@ -1,5 +1,5 @@
 [Desktop Entry]
 Name=Popbuster Kiosk
-Comment=Run Popbuster as the full Wayland kiosk session
+Comment=Run Popbuster as a minimal labwc kiosk session
 Exec=@PROJECT_ROOT@/scripts/run-pi-kiosk-session
 Type=Application

@@ -16,9 +16,9 @@ if [[ ! -f "${SESSION_TEMPLATE}" ]]; then
   exit 1
 fi
 
-if ! command -v cage >/dev/null 2>&1; then
-  echo "cage is required for Popbuster kiosk mode." >&2
-  echo "Install it first with: sudo apt install cage" >&2
+if ! command -v labwc >/dev/null 2>&1; then
+  echo "labwc is required for Popbuster kiosk mode." >&2
+  echo "Install it first with: sudo apt install labwc" >&2
   exit 1
 fi
 
@@ -122,7 +122,7 @@ LightDM main config backup:
 Blank cursor theme:
   ${CURSOR_THEME_DIR}
 
-Next reboot should skip the normal desktop and start Popbuster through cage:
+Next reboot should skip the normal desktop and start Popbuster through labwc:
   sudo reboot
 
 Recovery over SSH:

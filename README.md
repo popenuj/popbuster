@@ -188,12 +188,12 @@ The installed unit lives at `~/.config/systemd/user/popbuster.service`. It runs 
 
 ### Pi Kiosk Session
 
-Kiosk mode is an experiment to remove the brief desktop flash before Popbuster launches. It uses `cage`, a small Wayland kiosk compositor, and configures LightDM autologin to start a `popbuster-kiosk` session instead of the normal desktop. The regular desktop is not deleted.
+Kiosk mode is an experiment to remove the brief desktop flash before Popbuster launches. It uses a minimal `labwc` Wayland session and configures LightDM autologin to start `popbuster-kiosk` instead of the normal desktop. The regular desktop is not deleted.
 
 Install the compositor dependency on the Pi:
 
 ```bash
-sudo apt install cage
+sudo apt install labwc
 ```
 
 After deploying Popbuster, install kiosk mode:
@@ -213,7 +213,7 @@ Popbuster fullscreen
 
 A brief black screen with a blinking text cursor between Plymouth and Popbuster is the Linux virtual terminal showing during session handoff. It is separate from the mouse pointer inside Popbuster. If it becomes distracting, try hiding the kernel console cursor later with `vt.global_cursor_default=0` in `/boot/firmware/cmdline.txt`; keep that as a separate boot-polish experiment.
 
-The kiosk installer creates a transparent cursor theme at `~/.icons/popbuster-blank` and starts Cage with that cursor theme. This hides the compositor-level mouse pointer before Qt has a chance to draw Popbuster.
+The kiosk installer creates a transparent cursor theme at `~/.icons/popbuster-blank` and starts the kiosk compositor with that cursor theme. This hides the compositor-level mouse pointer before Qt has a chance to draw Popbuster.
 
 If kiosk mode fails, recover over SSH:
 

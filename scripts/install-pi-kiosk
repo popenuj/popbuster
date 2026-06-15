@@ -4,7 +4,8 @@ set -euo pipefail
 PROJECT_ROOT="${POPBUSTER_PROJECT_ROOT:-${HOME}/popbuster}"
 SESSION_NAME="popbuster-kiosk"
 SESSION_TEMPLATE="${PROJECT_ROOT}/support/lightdm/${SESSION_NAME}.desktop.in"
-SESSION_TARGET="/usr/share/wayland-sessions/${SESSION_NAME}.desktop"
+WAYLAND_SESSION_TARGET="/usr/share/wayland-sessions/${SESSION_NAME}.desktop"
+X_SESSION_TARGET="/usr/share/xsessions/${SESSION_NAME}.desktop"
 LIGHTDM_CONF="/etc/lightdm/lightdm.conf.d/90-popbuster-kiosk.conf"
 
 if [[ ! -f "${SESSION_TEMPLATE}" ]]; then
@@ -25,8 +26,10 @@ trap 'rm -f "${tmp_session}"' EXIT
 sed "s|@PROJECT_ROOT@|${PROJECT_ROOT}|g" "${SESSION_TEMPLATE}" > "${tmp_session}"
 
 sudo mkdir -p /usr/share/wayland-sessions
-sudo cp "${tmp_session}" "${SESSION_TARGET}"
-sudo chmod 0644 "${SESSION_TARGET}"
+sudo mkdir -p /usr/share/xsessions
+sudo cp "${tmp_session}" "${WAYLAND_SESSION_TARGET}"
+sudo cp "${tmp_session}" "${X_SESSION_TARGET}"
+sudo chmod 0644 "${WAYLAND_SESSION_TARGET}" "${X_SESSION_TARGET}"
 
 sudo mkdir -p /etc/lightdm/lightdm.conf.d
 sudo tee "${LIGHTDM_CONF}" >/dev/null <<EOF
@@ -41,6 +44,10 @@ systemctl --user disable --now popbuster.service >/dev/null 2>&1 || true
 
 cat <<EOF
 Installed Popbuster kiosk session.
+
+Session files:
+  ${WAYLAND_SESSION_TARGET}
+  ${X_SESSION_TARGET}
 
 Next reboot should skip the normal desktop and start Popbuster through cage:
   sudo reboot

@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SESSION_TARGET="/usr/share/wayland-sessions/popbuster-kiosk.desktop"
+WAYLAND_SESSION_TARGET="/usr/share/wayland-sessions/popbuster-kiosk.desktop"
+X_SESSION_TARGET="/usr/share/xsessions/popbuster-kiosk.desktop"
 LIGHTDM_CONF="/etc/lightdm/lightdm.conf.d/90-popbuster-kiosk.conf"
 
 sudo rm -f "${LIGHTDM_CONF}"
-sudo rm -f "${SESSION_TARGET}"
+sudo rm -f "${WAYLAND_SESSION_TARGET}"
+sudo rm -f "${X_SESSION_TARGET}"
 
 cat <<EOF
 Removed Popbuster kiosk session configuration.

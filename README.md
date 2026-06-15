@@ -224,10 +224,11 @@ If the normal desktop still appears instead of Popbuster, verify that LightDM ca
 
 ```bash
 ls -la /usr/share/wayland-sessions/popbuster-kiosk.desktop
+ls -la /usr/share/xsessions/popbuster-kiosk.desktop
 cat /etc/lightdm/lightdm.conf.d/90-popbuster-kiosk.conf
 ```
 
-The session file should be readable by everyone, for example `-rw-r--r--`.
+The session files should be readable by everyone, for example `-rw-r--r--`.
 
 After returning to the normal desktop, reinstall desktop-session autostart if desired:
 

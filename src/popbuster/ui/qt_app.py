@@ -285,7 +285,7 @@ class DesktopApp:
 
         if not self.single_display:
             self.internal.show()
-        self._start_app_intro()
+        QTimer.singleShot(250, self._start_app_intro)
         return self.qt.exec()
 
     def _start_app_intro(self) -> None:

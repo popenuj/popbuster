@@ -102,15 +102,6 @@ for cursor_name in \
   ln -sf left_ptr "${CURSOR_THEME_DIR}/cursors/${cursor_name}"
 done
 
-UDEV_RULES_FILE="/etc/udev/rules.d/99-popbuster-input.rules"
-sudo tee "${UDEV_RULES_FILE}" >/dev/null <<'EOF'
-# The vc4 display driver registers HDMI outputs as pointer devices via CEC.
-# Ignore them so labwc does not create a pointer seat and render a cursor.
-SUBSYSTEM=="input", KERNEL=="event*", ATTRS{name}=="vc4-hdmi*", ENV{LIBINPUT_IGNORE_DEVICE}="1"
-EOF
-sudo chmod 0644 "${UDEV_RULES_FILE}"
-sudo udevadm control --reload-rules && sudo udevadm trigger
-
 sudo mkdir -p /etc/lightdm/lightdm.conf.d
 sudo tee "${LIGHTDM_CONF}" >/dev/null <<EOF
 [Seat:*]
@@ -139,9 +130,6 @@ Session files:
 
 LightDM main config backup:
   ${LIGHTDM_MAIN_BACKUP}
-
-udev input rules:
-  ${UDEV_RULES_FILE}
 
 Blank cursor theme:
   ${CURSOR_THEME_DIR}

@@ -51,14 +51,6 @@ cat > "${LABWC_CONFIG_DIR}/rc.xml" <<EOF
   <mouse>
     <default />
   </mouse>
-  <libinput>
-    <device category="vc4-hdmi-0">
-      <sendEventsMode>no</sendEventsMode>
-    </device>
-    <device category="vc4-hdmi-1">
-      <sendEventsMode>no</sendEventsMode>
-    </device>
-  </libinput>
   <theme>
     <name>Popbuster</name>
   </theme>

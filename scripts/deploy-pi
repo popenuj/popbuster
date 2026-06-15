@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PI_HOST="${PI_HOST:-popbuster.local}"
+PI_USER="${PI_USER:-johnp}"
+PI_PATH="${PI_PATH:-/home/johnp/popbuster}"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+rsync -av --delete \
+  --exclude ".git/" \
+  --exclude ".venv/" \
+  --exclude "__pycache__/" \
+  --exclude "*.pyc" \
+  --exclude ".DS_Store" \
+  --exclude ".pytest_cache/" \
+  --exclude ".ruff_cache/" \
+  "${PROJECT_ROOT}/" "${PI_USER}@${PI_HOST}:${PI_PATH}/"
+
+echo "Deployed Popbuster to ${PI_USER}@${PI_HOST}:${PI_PATH}"

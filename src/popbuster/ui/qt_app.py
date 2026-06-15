@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import sys
 import os
 from pathlib import Path
@@ -135,20 +136,29 @@ class InternalWindow(KeyWindow):
 
 
 class QtDisplayVideoAdapter:
-    def __init__(self, output: OutputWindow, internal: InternalWindow) -> None:
+    def __init__(
+        self,
+        output: OutputWindow,
+        internal: InternalWindow,
+        mirror_enabled: bool,
+    ) -> None:
         self.output = output
         self.internal = internal
+        self.mirror_enabled = mirror_enabled
         self.player = QMediaPlayer()
         self.audio = QAudioOutput()
         self.audio.setVolume(0.7)
         self.player.setAudioOutput(self.audio)
         self.player.setVideoOutput(self.output.video)
 
-        self.mirror_player = QMediaPlayer()
-        self.mirror_audio = QAudioOutput()
-        self.mirror_audio.setVolume(0.0)
-        self.mirror_player.setAudioOutput(self.mirror_audio)
-        self.mirror_player.setVideoOutput(self.internal.video)
+        self.mirror_player: QMediaPlayer | None = None
+        self.mirror_audio: QAudioOutput | None = None
+        if self.mirror_enabled:
+            self.mirror_player = QMediaPlayer()
+            self.mirror_audio = QAudioOutput()
+            self.mirror_audio.setVolume(0.0)
+            self.mirror_player.setAudioOutput(self.mirror_audio)
+            self.mirror_player.setVideoOutput(self.internal.video)
 
     def show_boot(self, message: str) -> None:
         self.output.show_message(message)
@@ -197,35 +207,46 @@ class QtDisplayVideoAdapter:
     def load(self, path: Path) -> None:
         source = QUrl.fromLocalFile(str(path))
         self.player.setSource(source)
-        self.mirror_player.setSource(source)
+        if self.mirror_player is not None:
+            self.mirror_player.setSource(source)
 
     def play(self) -> None:
         self.player.play()
-        self.mirror_player.play()
+        if self.mirror_player is not None:
+            self.mirror_player.play()
 
     def pause(self) -> None:
         self.player.pause()
-        self.mirror_player.pause()
+        if self.mirror_player is not None:
+            self.mirror_player.pause()
 
     def stop(self) -> None:
         self.player.stop()
-        self.mirror_player.stop()
+        if self.mirror_player is not None:
+            self.mirror_player.stop()
 
     def seek_ms(self, position_ms: int) -> None:
         self.player.setPosition(position_ms)
-        self.mirror_player.setPosition(position_ms)
+        if self.mirror_player is not None:
+            self.mirror_player.setPosition(position_ms)
 
     def position_ms(self) -> int:
         return self.player.position()
 
 
 class DesktopApp:
-    def __init__(self) -> None:
+    def __init__(self, *, fullscreen: bool = False, single_display: bool = False) -> None:
         self.qt = QApplication(sys.argv)
         register_application_fonts()
+        self.fullscreen = fullscreen
+        self.single_display = single_display
         self.output = OutputWindow()
         self.internal = InternalWindow()
-        self.adapter = QtDisplayVideoAdapter(self.output, self.internal)
+        self.adapter = QtDisplayVideoAdapter(
+            self.output,
+            self.internal,
+            mirror_enabled=not self.single_display,
+        )
         self.playing_app_start_video = False
         self.controller = PopbusterController(
             catalog=TapeCatalog.from_json(CATALOG_PATH),
@@ -250,8 +271,13 @@ class DesktopApp:
         self.internal.key_handler = self._handle_key
 
     def run(self) -> int:
-        self.output.show()
-        self.internal.show()
+        if self.fullscreen:
+            self.output.showFullScreen()
+        else:
+            self.output.show()
+
+        if not self.single_display:
+            self.internal.show()
         self._start_app_intro()
         return self.qt.exec()
 
@@ -318,5 +344,24 @@ class DesktopApp:
             self.controller.playback_finished()
 
 
-def run() -> int:
-    return DesktopApp().run()
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Run the Popbuster prototype.")
+    parser.add_argument(
+        "--fullscreen",
+        action="store_true",
+        help="Open the main output window fullscreen.",
+    )
+    parser.add_argument(
+        "--single-display",
+        action="store_true",
+        help="Use one display window instead of the mirrored development pair.",
+    )
+    return parser.parse_args(argv)
+
+
+def run(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
+    return DesktopApp(
+        fullscreen=args.fullscreen,
+        single_display=args.single_display,
+    ).run()

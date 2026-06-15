@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROJECT_ROOT="${POPBUSTER_PROJECT_ROOT:-/home/johnp/popbuster}"
+WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-0}"
+XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/1000}"
+
+cd "${PROJECT_ROOT}"
+source .venv/bin/activate
+
+export WAYLAND_DISPLAY
+export XDG_RUNTIME_DIR
+
+python -m popbuster --single-display --fullscreen "$@"

@@ -76,7 +76,23 @@ Appliance settings are saved next to the resume file in `config.json`.
 
 ## Raspberry Pi Development
 
-On the Raspberry Pi 5 desktop session, activate the virtual environment and run Popbuster against the active Wayland display:
+Deploy the current project from macOS to the Pi:
+
+```bash
+scripts/deploy-pi
+```
+
+Defaults:
+
+```text
+PI_HOST=popbuster.local
+PI_USER=johnp
+PI_PATH=/home/johnp/popbuster
+```
+
+Override any of those environment variables if needed.
+
+On the Raspberry Pi 5 desktop session, run Popbuster against the active Wayland display:
 
 ```bash
 cd /home/johnp/popbuster
@@ -84,7 +100,19 @@ source .venv/bin/activate
 XDG_RUNTIME_DIR=/run/user/1000 WAYLAND_DISPLAY=wayland-0 python -m popbuster
 ```
 
-The current app still opens normal desktop windows. A later Pi/appliance mode should switch this to fullscreen and eventually systemd autostart.
+For the current DSI appliance-style test mode, use:
+
+```bash
+scripts/run-pi
+```
+
+That wraps:
+
+```bash
+XDG_RUNTIME_DIR=/run/user/1000 WAYLAND_DISPLAY=wayland-0 python -m popbuster --single-display --fullscreen
+```
+
+The default macOS/development mode still opens two mirrored windows. Pi mode uses one fullscreen window on the active display. A later milestone should turn this into a systemd autostart service.
 
 ## Video
 

@@ -1,14 +1,14 @@
 [
   {
-    "id": "demo",
-    "title": "Demo Tape",
-    "collection": "Popbuster Test Reel",
-    "video_path": "../Content/Movies/ML_tut_area2.mp4"
-  },
-  {
     "id": "local-test",
     "title": "Local Test Video",
     "collection": "Developer Clip",
     "video_path": "assets/videos/test_video.mp4"
+  },
+  {
+    "id": "demo",
+    "title": "Demo Tape",
+    "collection": "Popbuster Test Reel",
+    "video_path": "../Content/Movies/ML_tut_area2.mp4"
   }
 ]

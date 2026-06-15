@@ -1,0 +1,19 @@
+[Unit]
+Description=Popbuster appliance app
+After=graphical-session.target
+Wants=graphical-session.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/popbuster
+Environment=WAYLAND_DISPLAY=wayland-0
+Environment=XDG_RUNTIME_DIR=/run/user/%U
+Environment=POPBUSTER_FULLSCREEN=1
+Environment=POPBUSTER_SINGLE_DISPLAY=1
+ExecStartPre=/bin/sleep 3
+ExecStart=%h/popbuster/scripts/run-pi
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PROJECT_ROOT="${POPBUSTER_PROJECT_ROOT:-/home/johnp/popbuster}"
+PROJECT_ROOT="${POPBUSTER_PROJECT_ROOT:-${HOME}/popbuster}"
 WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-0}"
 XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/1000}"
 POPBUSTER_FULLSCREEN="${POPBUSTER_FULLSCREEN:-1}"

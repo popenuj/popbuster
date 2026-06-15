@@ -119,7 +119,36 @@ POPBUSTER_FULLSCREEN=0 scripts/run-pi
 POPBUSTER_FULLSCREEN=0 POPBUSTER_SINGLE_DISPLAY=0 scripts/run-pi
 ```
 
-The default macOS/development mode still opens two mirrored windows. Pi mode uses one fullscreen window on the active 800x480 DSI display, hides the cursor, and uses tighter text padding for the smaller screen. A later milestone should turn this into a systemd autostart service.
+The default macOS/development mode still opens two mirrored windows. Pi mode uses one fullscreen window on the active 800x480 DSI display, hides the cursor, and uses tighter text padding for the smaller screen.
+
+### Pi Autostart
+
+The current autostart path is a user-level systemd service that runs after the Pi desktop session starts. This assumes the Pi is configured to log into the desktop automatically, because Popbuster currently renders into that Wayland session.
+
+After deploying to the Pi, install the service on the Pi:
+
+```bash
+cd /home/johnp/popbuster
+scripts/install-pi-autostart
+```
+
+Start it immediately without rebooting:
+
+```bash
+systemctl --user start popbuster.service
+```
+
+Useful service commands:
+
+```bash
+systemctl --user status popbuster.service
+journalctl --user -u popbuster.service -f
+systemctl --user restart popbuster.service
+systemctl --user stop popbuster.service
+systemctl --user disable popbuster.service
+```
+
+The installed unit lives at `~/.config/systemd/user/popbuster.service`. It runs `scripts/run-pi`, so the same `POPBUSTER_FULLSCREEN`, `POPBUSTER_SINGLE_DISPLAY`, and `WAYLAND_DISPLAY` overrides still apply through the service file.
 
 ## Video
 

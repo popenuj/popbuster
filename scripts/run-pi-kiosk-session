@@ -21,6 +21,13 @@ export WLR_NO_HARDWARE_CURSORS="${WLR_NO_HARDWARE_CURSORS:-1}"
 rm -rf "${KIOSK_CONFIG_ROOT}"
 mkdir -p "${LABWC_CONFIG_DIR}"
 
+cat > "${LABWC_CONFIG_DIR}/environment" <<EOF
+XCURSOR_THEME=${XCURSOR_THEME}
+XCURSOR_PATH=${XCURSOR_PATH}
+XCURSOR_SIZE=${XCURSOR_SIZE}
+WLR_NO_HARDWARE_CURSORS=${WLR_NO_HARDWARE_CURSORS}
+EOF
+
 cat > "${LABWC_CONFIG_DIR}/autostart" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
@@ -37,23 +44,25 @@ chmod +x "${LABWC_CONFIG_DIR}/autostart"
 
 cat > "${LABWC_CONFIG_DIR}/rc.xml" <<EOF
 <?xml version="1.0"?>
-<openbox_config xmlns="http://openbox.org/3.4/rc">
-  <core>
-    <cursor>
-      <theme>${XCURSOR_THEME}</theme>
-      <size>${XCURSOR_SIZE}</size>
-    </cursor>
-  </core>
+<labwc_config>
   <keyboard>
     <default />
   </keyboard>
   <mouse>
     <default />
   </mouse>
+  <libinput>
+    <device category="vc4-hdmi-0">
+      <sendEventsMode>no</sendEventsMode>
+    </device>
+    <device category="vc4-hdmi-1">
+      <sendEventsMode>no</sendEventsMode>
+    </device>
+  </libinput>
   <theme>
     <name>Popbuster</name>
   </theme>
-</openbox_config>
+</labwc_config>
 EOF
 
 export XDG_CONFIG_HOME="${KIOSK_CONFIG_ROOT}"

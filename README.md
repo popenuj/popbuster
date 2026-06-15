@@ -213,7 +213,7 @@ Popbuster fullscreen
 
 A brief black screen with a blinking text cursor between Plymouth and Popbuster is the Linux virtual terminal showing during session handoff. It is separate from the mouse pointer inside Popbuster. If it becomes distracting, try hiding the kernel console cursor later with `vt.global_cursor_default=0` in `/boot/firmware/cmdline.txt`; keep that as a separate boot-polish experiment.
 
-The kiosk installer creates a transparent cursor theme at `~/.icons/popbuster-blank` and starts the kiosk compositor with that cursor theme. This hides the compositor-level mouse pointer before Qt has a chance to draw Popbuster.
+The kiosk installer creates a transparent cursor theme at `~/.icons/popbuster-blank` and starts the kiosk compositor with that cursor theme. The kiosk session also writes a labwc `environment` file for the cursor settings and disables events from the Raspberry Pi HDMI pseudo-pointer devices (`vc4-hdmi-0` and `vc4-hdmi-1`). Those devices can appear in `libinput list-devices` even when no mouse is plugged in.
 
 If kiosk mode fails, recover over SSH:
 

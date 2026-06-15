@@ -6,10 +6,13 @@ X_SESSION_TARGET="/usr/share/xsessions/popbuster-kiosk.desktop"
 LIGHTDM_CONF="/etc/lightdm/lightdm.conf.d/90-popbuster-kiosk.conf"
 LIGHTDM_MAIN_CONF="/etc/lightdm/lightdm.conf"
 LIGHTDM_MAIN_BACKUP="/etc/lightdm/lightdm.conf.before-popbuster-kiosk"
+UDEV_RULES_FILE="/etc/udev/rules.d/99-popbuster-input.rules"
 
 sudo rm -f "${LIGHTDM_CONF}"
 sudo rm -f "${WAYLAND_SESSION_TARGET}"
 sudo rm -f "${X_SESSION_TARGET}"
+sudo rm -f "${UDEV_RULES_FILE}"
+sudo udevadm control --reload-rules
 
 if sudo test -f "${LIGHTDM_MAIN_BACKUP}"; then
   sudo cp "${LIGHTDM_MAIN_BACKUP}" "${LIGHTDM_MAIN_CONF}"

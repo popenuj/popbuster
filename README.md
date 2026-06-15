@@ -76,6 +76,127 @@ Appliance settings are saved next to the resume file in `config.json`.
 
 ## Raspberry Pi Development
 
+### New Pi Setup Checklist
+
+Use this path for each fresh Popbuster unit. It assumes a Raspberry Pi 5, Raspberry Pi OS with desktop, the Waveshare 4.3-inch 800x480 DSI display connected to `CAM/DISP 0`, and SSH access from the Mac.
+
+1. Flash the microSD card with Raspberry Pi Imager.
+   - OS: Raspberry Pi OS with desktop, 64-bit.
+   - Hostname: `popbuster` for the prototype, or a per-unit name like `popbuster-jessie`.
+   - User: `johnp` for the prototype, or the intended owner/user for a gift unit.
+   - Enable SSH.
+   - Configure Wi-Fi.
+   - Use a real password for gift units.
+
+2. Boot the Pi with the official Raspberry Pi 5 power supply.
+   - Avoid powering the Pi from a laptop or low-current USB-C power strip.
+   - If the display shows a low-voltage warning, fix power before debugging software.
+
+3. SSH in from the Mac.
+
+```bash
+ssh johnp@popbuster.local
+```
+
+If `.local` name resolution is flaky, use the Pi's IP address instead.
+
+4. Update Raspberry Pi OS.
+
+```bash
+sudo apt update
+sudo apt full-upgrade
+sudo reboot
+```
+
+5. Install system packages.
+
+```bash
+sudo apt install git python3-venv labwc x11-apps
+```
+
+6. Configure the DSI display in `/boot/firmware/config.txt`.
+
+```bash
+sudo nano /boot/firmware/config.txt
+```
+
+Use the display settings in [Pi DSI Display](#pi-dsi-display), then reboot.
+
+7. Verify that the display is detected.
+
+```bash
+wlr-randr
+ls -la /sys/class/drm
+```
+
+Expected: an enabled `DSI-1` output at `800x480`. If you see `NOOP-1 "Headless output"`, recheck the DSI cable direction, the `CAM/DISP 0` port, and the `dsi0` overlay option.
+
+8. Deploy Popbuster from the Mac.
+
+```bash
+cd "/Users/jonathanpopenuck/Desktop/Manor Lords/ManorLords/Popbuster"
+PI_HOST=popbuster.local scripts/deploy-pi
+```
+
+Use `PI_HOST=192.168.0.18` or the current IP address if `.local` is not resolving.
+
+9. Create the Python environment on the Pi.
+
+```bash
+cd ~/popbuster
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e .
+```
+
+10. Keep Plymouth on the stable stock spinner.
+
+```bash
+sudo plymouth-set-default-theme -R spinner
+```
+
+11. Remove any leftover input-rule experiment from earlier prototypes.
+
+```bash
+sudo rm -f /etc/udev/rules.d/99-popbuster-input.rules
+sudo udevadm control --reload-rules
+```
+
+12. Install the current appliance boot mode.
+
+```bash
+cd ~/popbuster
+scripts/install-pi-kiosk
+sudo reboot
+```
+
+Expected boot path:
+
+```text
+Plymouth spinner
+Popbuster fullscreen
+```
+
+If kiosk mode misbehaves, recover over SSH:
+
+```bash
+ssh johnp@popbuster.local
+cd ~/popbuster
+scripts/restore-pi-desktop
+sudo reboot
+```
+
+After restoring the desktop, reinstall desktop-session autostart if needed:
+
+```bash
+cd ~/popbuster
+scripts/install-pi-autostart
+sudo reboot
+```
+
+### Deploy From macOS
+
 Deploy the current project from macOS to the Pi:
 
 ```bash
@@ -188,7 +309,7 @@ The installed unit lives at `~/.config/systemd/user/popbuster.service`. It runs 
 
 ### Pi Kiosk Session
 
-Kiosk mode is an experiment to remove the brief desktop flash before Popbuster launches. It uses a minimal `labwc` Wayland session and configures LightDM autologin to start `popbuster-kiosk` instead of the normal desktop. The regular desktop is not deleted.
+Kiosk mode is the current appliance-style boot path. It uses a minimal `labwc` Wayland session and configures LightDM autologin to start `popbuster-kiosk` instead of the normal Raspberry Pi desktop. The regular desktop is not deleted and can be restored over SSH.
 
 Install the compositor dependency on the Pi:
 
@@ -211,7 +332,7 @@ Plymouth spinner
 Popbuster fullscreen
 ```
 
-A brief black screen with a blinking text cursor between Plymouth and Popbuster is the Linux virtual terminal showing during session handoff. It is separate from the mouse pointer inside Popbuster. If it becomes distracting, try hiding the kernel console cursor later with `vt.global_cursor_default=0` in `/boot/firmware/cmdline.txt`; keep that as a separate boot-polish experiment.
+A brief black screen with a blinking text cursor between Plymouth and Popbuster is the Linux virtual terminal showing during session handoff. It is separate from the mouse pointer inside Popbuster. Leave this alone for now unless it becomes more distracting than the risk of boot/display churn.
 
 The kiosk installer creates a transparent cursor theme at `~/.icons/popbuster-blank` and starts the kiosk compositor with that cursor theme. The restore script also removes the old experimental `99-popbuster-input.rules` udev rule if it exists, because that rule can leave the Pi in a confusing input state after cursor experiments.
 
@@ -250,9 +371,9 @@ sudo plymouth-set-default-theme -R spinner
 sudo reboot
 ```
 
-The Pi 5 boots quickly enough that this is a reasonable prototype baseline, and it avoids Plymouth/display handoff flicker while Popbuster is still running inside the desktop session.
+The Pi 5 boots quickly enough that this is a reasonable prototype baseline, and it avoids Plymouth/display handoff flicker while the app launch path is still evolving.
 
-Popbuster also includes an experimental custom Plymouth theme. It currently holds a single frame until the OS hands off to the desktop session and Popbuster autostarts. In testing, Plymouth could briefly show the frame, go black during display handoff, show it again, then hand off to the desktop. Keep it as an experiment until kiosk-session work is stable.
+Popbuster also includes an experimental custom Plymouth theme. It currently holds a single frame until the OS hands off to the app session. In testing, Plymouth could briefly show the frame, go black during display handoff, show it again, then hand off to Popbuster. Keep it as an experiment; the app-start video/static sequence is the safer place to create the polished Popbuster boot illusion for now.
 
 Bundled splash sequences:
 

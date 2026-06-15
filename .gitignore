@@ -4,3 +4,7 @@ __pycache__/
 .DS_Store
 .pytest_cache/
 .ruff_cache/
+
+# Original/generated splash source art. Normalized Plymouth frames live in support/plymouth/.
+assets/splash_screens/antenna_fixing/
+assets/splash_screens/ken_tv_unboxing/

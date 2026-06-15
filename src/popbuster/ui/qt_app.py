@@ -58,9 +58,9 @@ def appliance_font(size: int, bold: bool = False) -> QFont:
 
 
 def fullscreen_cursor() -> QCursor:
-    pixmap = QPixmap(32, 32)
-    pixmap.fill(Qt.GlobalColor.transparent)
-    return QCursor(pixmap)
+    # BlankCursor maps to wl_pointer_set_cursor(NULL) on Wayland — no surface to
+    # upload, so there's no gap between pointer-enter and the cursor disappearing.
+    return QCursor(Qt.CursorShape.BlankCursor)
 
 
 class KeyWindow(QMainWindow):

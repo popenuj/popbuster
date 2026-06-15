@@ -254,7 +254,6 @@ class DesktopApp:
             mirror_enabled=not self.single_display,
         )
         self.playing_app_start_video = False
-        self.app_start_playback_started = False
         self.controller = PopbusterController(
             catalog=TapeCatalog.from_json(CATALOG_PATH),
             resume_store=ResumeStore(RESUME_PATH),
@@ -299,14 +298,13 @@ class DesktopApp:
             return
 
         self.playing_app_start_video = True
-        self.app_start_playback_started = False
         self.output.show_video()
         self.internal.show_video()
         self.adapter.load(APP_START_VIDEO_PATH)
+        self.adapter.play()
 
     def _start_boot_sequence(self) -> None:
         self.playing_app_start_video = False
-        self.app_start_playback_started = False
         self.adapter.stop()
         self._boot_tick()
         self.boot_timer.start()
@@ -343,18 +341,6 @@ class DesktopApp:
             self.qt.quit()
 
     def _media_status_changed(self, status: QMediaPlayer.MediaStatus) -> None:
-        if self.playing_app_start_video and status in {
-            QMediaPlayer.MediaStatus.LoadedMedia,
-            QMediaPlayer.MediaStatus.BufferedMedia,
-        }:
-            if self.app_start_playback_started:
-                return
-            self.app_start_playback_started = True
-            print(f"popbuster: app-start media ready ({status.name}); playing")
-            self.adapter.seek_ms(0)
-            self.adapter.play()
-            return
-
         if self.playing_app_start_video and status in {
             QMediaPlayer.MediaStatus.EndOfMedia,
             QMediaPlayer.MediaStatus.InvalidMedia,

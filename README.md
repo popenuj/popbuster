@@ -112,6 +112,13 @@ That wraps:
 XDG_RUNTIME_DIR=/run/user/1000 WAYLAND_DISPLAY=wayland-0 python -m popbuster --single-display --fullscreen
 ```
 
+To compare against the windowed desktop path while debugging Pi video rendering:
+
+```bash
+POPBUSTER_FULLSCREEN=0 scripts/run-pi
+POPBUSTER_FULLSCREEN=0 POPBUSTER_SINGLE_DISPLAY=0 scripts/run-pi
+```
+
 The default macOS/development mode still opens two mirrored windows. Pi mode uses one fullscreen window on the active 800x480 DSI display, hides the cursor, and uses tighter text padding for the smaller screen. A later milestone should turn this into a systemd autostart service.
 
 ## Video

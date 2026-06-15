@@ -26,6 +26,7 @@ sed "s|@PROJECT_ROOT@|${PROJECT_ROOT}|g" "${SESSION_TEMPLATE}" > "${tmp_session}
 
 sudo mkdir -p /usr/share/wayland-sessions
 sudo cp "${tmp_session}" "${SESSION_TARGET}"
+sudo chmod 0644 "${SESSION_TARGET}"
 
 sudo mkdir -p /etc/lightdm/lightdm.conf.d
 sudo tee "${LIGHTDM_CONF}" >/dev/null <<EOF
@@ -34,6 +35,7 @@ autologin-user=${USER}
 autologin-session=${SESSION_NAME}
 user-session=${SESSION_NAME}
 EOF
+sudo chmod 0644 "${LIGHTDM_CONF}"
 
 systemctl --user disable --now popbuster.service >/dev/null 2>&1 || true
 

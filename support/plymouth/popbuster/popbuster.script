@@ -1,56 +1,11 @@
 Window.SetBackgroundTopColor(0, 0, 0);
 Window.SetBackgroundBottomColor(0, 0, 0);
 
-sequence_frames[0] = Image("images/active/frame_001.png");
-sequence_frames[1] = Image("images/active/frame_002.png");
-sequence_frames[2] = Image("images/active/frame_003.png");
-sequence_frames[3] = Image("images/active/frame_004.png");
-sequence_frames[4] = Image("images/active/frame_005.png");
-sequence_frames[5] = Image("images/active/frame_006.png");
-sequence_frames[6] = Image("images/active/frame_007.png");
-sequence_frames[7] = Image("images/active/frame_008.png");
-sequence_frames[8] = Image("images/active/frame_009.png");
-sequence_frames[9] = Image("images/active/frame_010.png");
-sequence_frames[10] = Image("images/active/frame_011.png");
-
-static_frames[0] = Image("images/static/frame_001.png");
-static_frames[1] = Image("images/static/frame_002.png");
-static_frames[2] = Image("images/static/frame_003.png");
-static_frames[3] = Image("images/static/frame_004.png");
-static_frames[4] = Image("images/static/frame_005.png");
-static_frames[5] = Image("images/static/frame_006.png");
-static_frames[6] = Image("images/static/frame_007.png");
-static_frames[7] = Image("images/static/frame_008.png");
-
-sequence_count = 11;
-static_count = 8;
+splash_image = Image("images/active/frame_001.png");
 frame_width = 800;
 frame_height = 480;
-sequence_fps = 2.5;
-static_fps = 10;
 
-sprite = Sprite(sequence_frames[0]);
-sprite.SetX((Window.GetWidth() - frame_width) / 2);
-sprite.SetY((Window.GetHeight() - frame_height) / 2);
-sprite.SetZ(100);
-
-start_time = Plymouth.GetTime();
-
-fun refresh_callback()
-{
-    elapsed = Plymouth.GetTime() - start_time;
-    sequence_index = Math.Int(elapsed * sequence_fps);
-
-    if (sequence_index < sequence_count)
-    {
-        sprite.SetImage(sequence_frames[sequence_index]);
-    }
-    else
-    {
-        static_elapsed = elapsed - (sequence_count / sequence_fps);
-        static_index = Math.Int(static_elapsed * static_fps) % static_count;
-        sprite.SetImage(static_frames[static_index]);
-    }
-}
-
-Plymouth.SetRefreshFunction(refresh_callback);
+splash_sprite = Sprite(splash_image);
+splash_sprite.SetX((Window.GetWidth() - frame_width) / 2);
+splash_sprite.SetY((Window.GetHeight() - frame_height) / 2);
+splash_sprite.SetZ(100);

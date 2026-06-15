@@ -188,7 +188,7 @@ The installed unit lives at `~/.config/systemd/user/popbuster.service`. It runs 
 
 ### Plymouth Boot Splash
 
-Popbuster includes a Plymouth theme for the early boot splash. The theme plays one short image sequence, then loops the static frames until the OS hands off to the desktop session and Popbuster autostarts.
+Popbuster includes a Plymouth theme for the early boot splash. The current theme intentionally holds a single frame until the OS hands off to the desktop session and Popbuster autostarts. This is a stability baseline before reintroducing animated frame sequences.
 
 Bundled splash sequences:
 
@@ -210,7 +210,7 @@ POPBUSTER_SPLASH_SEQUENCE=antenna_fixing scripts/install-pi-plymouth
 sudo reboot
 ```
 
-The installer copies the selected sequence into `/usr/share/plymouth/themes/popbuster`, sets it as the default Plymouth theme, and rebuilds the boot image with `plymouth-set-default-theme -R popbuster`. Plymouth starts after the earliest firmware/kernel phase, so a tiny amount of Raspberry Pi boot output may still appear before the custom splash. The brief desktop flash is handled separately by the future kiosk-session work.
+The installer copies the selected sequence into `/usr/share/plymouth/themes/popbuster`, sets it as the default Plymouth theme, and rebuilds the boot image with `plymouth-set-default-theme -R popbuster`. The static theme displays the selected sequence's first frame. Plymouth starts after the earliest firmware/kernel phase, so a tiny amount of Raspberry Pi boot output may still appear before the custom splash. The brief desktop flash is handled separately by the future kiosk-session work.
 
 ## Video
 

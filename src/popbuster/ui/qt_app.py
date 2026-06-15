@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 
 from PySide6.QtCore import QTimer, Qt, QUrl
-from PySide6.QtGui import QFont, QFontDatabase, QKeyEvent
+from PySide6.QtGui import QCursor, QFont, QFontDatabase, QKeyEvent
 from PySide6.QtMultimedia import QAudioOutput, QMediaPlayer
 from PySide6.QtMultimediaWidgets import QVideoWidget
 from PySide6.QtWidgets import (
@@ -32,6 +32,7 @@ STATE_DIR = Path(os.environ.get("POPBUSTER_STATE_DIR", Path.home() / ".popbuster
 RESUME_PATH = STATE_DIR / "resume_positions.json"
 CONFIG_PATH = STATE_DIR / "config.json"
 APP_FONT_FAMILY = "Menlo"
+DSI_SIZE = (800, 480)
 
 
 def register_application_fonts() -> None:
@@ -70,20 +71,23 @@ class KeyWindow(QMainWindow):
 
 
 class OutputWindow(KeyWindow):
-    def __init__(self) -> None:
+    def __init__(self, *, appliance_layout: bool = False) -> None:
         super().__init__()
         self.setWindowTitle("Popbuster Output / TV")
-        self.resize(960, 540)
+        self.appliance_layout = appliance_layout
+        self.resize(*DSI_SIZE if self.appliance_layout else (960, 540))
+        self.message_padding = 18 if self.appliance_layout else 28
 
         self.stack = QStackedWidget()
         self.message = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
         self.message.setWordWrap(True)
-        self.message.setFont(appliance_font(28))
+        self.message.setFont(appliance_font(24 if self.appliance_layout else 28))
         self.message.setStyleSheet(
-            "background: #000; color: #f7f7f7; padding: 28px;"
+            f"background: #000; color: #f7f7f7; padding: {self.message_padding}px;"
         )
 
         self.video = QVideoWidget()
+        self.video.setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
         self.video.setStyleSheet("background: #000;")
 
         self.stack.addWidget(self.message)
@@ -92,7 +96,9 @@ class OutputWindow(KeyWindow):
 
     def show_message(self, text: str, blue: bool = False) -> None:
         color = "#8eb6ff" if blue else "#f7f7f7"
-        self.message.setStyleSheet(f"background: #000; color: {color}; padding: 28px;")
+        self.message.setStyleSheet(
+            f"background: #000; color: {color}; padding: {self.message_padding}px;"
+        )
         self.message.setText(text)
         self.stack.setCurrentWidget(self.message)
 
@@ -240,7 +246,7 @@ class DesktopApp:
         register_application_fonts()
         self.fullscreen = fullscreen
         self.single_display = single_display
-        self.output = OutputWindow()
+        self.output = OutputWindow(appliance_layout=self.single_display)
         self.internal = InternalWindow()
         self.adapter = QtDisplayVideoAdapter(
             self.output,
@@ -272,6 +278,7 @@ class DesktopApp:
 
     def run(self) -> int:
         if self.fullscreen:
+            self.output.setCursor(QCursor(Qt.CursorShape.BlankCursor))
             self.output.showFullScreen()
         else:
             self.output.show()

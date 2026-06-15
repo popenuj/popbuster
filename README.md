@@ -112,7 +112,7 @@ That wraps:
 XDG_RUNTIME_DIR=/run/user/1000 WAYLAND_DISPLAY=wayland-0 python -m popbuster --single-display --fullscreen
 ```
 
-The default macOS/development mode still opens two mirrored windows. Pi mode uses one fullscreen window on the active display. A later milestone should turn this into a systemd autostart service.
+The default macOS/development mode still opens two mirrored windows. Pi mode uses one fullscreen window on the active 800x480 DSI display, hides the cursor, and uses tighter text padding for the smaller screen. A later milestone should turn this into a systemd autostart service.
 
 ## Video
 

@@ -32,7 +32,7 @@ REFERENCE_FIELDS = {
     "occasions": "occasions.yml",
     "pets": "pets.yml",
 }
-REQUIRED_VIDEO_FIELDS = ("id", "title", "media_type", "year", "file")
+REQUIRED_VIDEO_FIELDS = ("id", "title", "media_type", "file")
 REQUIRED_TAPE_FIELDS = ("id", "title", "filters")
 
 

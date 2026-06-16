@@ -438,6 +438,8 @@ people:
 
 Use `unknown` when you cannot identify a value and `miscellaneous` when the value is known but not specific enough to deserve its own category yet. Locations and occasions both include those defaults.
 
+`date` and `year` are optional. Add them when the recording or surrounding context makes them trustworthy; omit them when the clip is undated. Undated clips still play and appear in people/place/occasion filters, but they do not appear in the Year filter.
+
 `tapes.yml` defines curated physical tapes as filters over `videos.yml`:
 
 ```yaml
@@ -541,4 +543,4 @@ Focus either Popbuster window and use:
 6. Save resume positions in `~/.popbuster/resume_positions.json`.
 7. Document setup, controls, and future hardware replacement points.
 
-Future milestones can add RFID readers, IR remote mapping, GPIO status LED/microswitch adapters, systemd unit files, Pi display routing, Setup Tape provisioning, and package download/cache logic.
+Future milestones can add RFID readers, IR remote mapping, GPIO status LED/microswitch adapters, systemd unit files, Pi display routing, Setup Tape provisioning, package download/cache logic, and a GitHub-backed software update check that runs when the appliance has Wi-Fi available.

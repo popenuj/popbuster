@@ -63,3 +63,292 @@ videos:
       - digitized
     duration: 00:03:16
     file: videos/home_videos/caroline_in_empty_pool.mp4
+
+  - id: 1996_betty_christmas_play
+    title: Betty's 1996 Christmas Play
+    media_type: home_video
+    collection: Family Movies
+    date: 1996-12-18
+    year: 1996
+    people:
+      - betty
+    locations:
+      - bryant
+    occasions:
+      - school_play
+    tags:
+      - vhs
+      - digitized
+    duration: 00:05:25
+    file: videos/home_videos/1996_betty_christmas_play.mp4
+
+  - id: 1996_gillian_christmas_play
+    title: Gillian's 1996 Christmas Play
+    media_type: home_video
+    collection: Family Movies
+    date: 1996-12-18
+    year: 1996
+    people:
+      - gillian
+    locations:
+      - bryant
+    occasions:
+      - school_play
+    tags:
+      - vhs
+      - digitized
+    duration: 00:04:22
+    file: videos/home_videos/1996_gillian_christmas_play.mp4
+
+  - id: 1996_john_christmas_play
+    title: John's 1996 Christmas Play
+    media_type: home_video
+    collection: Family Movies
+    date: 1996-12-18
+    year: 1996
+    people:
+      - john
+    locations:
+      - bryant
+    occasions:
+      - school_play
+    tags:
+      - vhs
+      - digitized
+    duration: 00:02:09
+    file: videos/home_videos/1996_john_christmas_play.mp4
+
+  - id: 1996_john_badger_presentation
+    title: John's 1996 Badger Presentation
+    media_type: home_video
+    collection: Family Movies
+    date: 1996-12-18
+    year: 1996
+    people:
+      - john
+    locations:
+      - bryant
+    occasions:
+      - school_play
+    tags:
+      - vhs
+      - digitized
+    duration: 00:01:21
+    file: videos/home_videos/1996_john_badger_presentation.mp4
+
+  - id: 1996_christmas_day
+    title: Christmas Day
+    media_type: home_video
+    collection: Family Movies
+    date: 1996-12-25
+    year: 1996
+    people:
+      - betty
+      - gillian
+      - caroline
+      - john
+      - mom
+      - dad
+      - papa
+      - nanny
+    locations:
+      - lake_oswego_house
+    occasions:
+      - christmas
+    tags:
+      - vhs
+      - digitized
+    duration: 00:04:26
+    file: videos/home_videos/1996_christmas_day.mp4
+
+  - id: 1997_gillian_bday
+    title: Gillian's 11th Birthday
+    media_type: home_video
+    collection: Family Movies
+    date: 1997-01-10
+    year: 1997
+    people:
+      - gillian
+      - john
+      - betty
+      - mom
+      - dad
+      - caroline
+    locations:
+      - lake_oswego_house
+    occasions:
+      - birthdays
+    tags:
+      - vhs
+      - digitized
+    duration: 00:02:54
+    file: videos/home_videos/1997_gillian_bday.mp4
+
+  - id: 1997_betty_bday
+    title: Betty's 11th Birthday
+    media_type: home_video
+    collection: Family Movies
+    date: 1997-04-12
+    year: 1997
+    people:
+      - gillian
+      - john
+      - betty
+      - mom
+      - dad
+      - caroline
+    locations:
+      - miscellaneous
+    occasions:
+      - birthdays
+    tags:
+      - vhs
+      - digitized
+    duration: 00:07:03
+    file: videos/home_videos/1997_betty_bday.mp4
+
+  - id: betty_makes_a_whoopee
+    title: Betty Makes a Whoopee
+    media_type: home_video
+    collection: Family Movies
+    year: 1997
+    people:
+      - betty
+      - caroline
+      - mom
+      - gillian
+      - john
+    locations:
+      - lake_oswego_house
+    occasions:
+      - unknown
+    tags:
+      - vhs
+      - digitized
+    duration: 00:01:26
+    file: videos/home_videos/betty_makes_a_whoopee.mp4
+
+  - id: 1997_caroline_bday
+    title: Caroline's 2nd Birthday
+    media_type: home_video
+    collection: Family Movies
+    date: 1997-05-08
+    year: 1997
+    people:
+      - gillian
+      - john
+      - betty
+      - mom
+      - dad
+      - caroline
+    locations:
+      - lake_oswego_house
+    occasions:
+      - birthdays
+    tags:
+      - vhs
+      - digitized
+    duration: 00:06:48
+    file: videos/home_videos/1997_caroline_bday.mp4
+
+  - id: 1997_filet_of_soul
+    title: 1997 Insane Asylum
+    media_type: home_video
+    collection: Family Movies
+    date: 1997-12-25
+    year: 1997
+    people:
+      - betty
+      - gillian
+      - caroline
+      - john
+      - mom
+      - dad
+      - papa
+      - nanny
+    locations:
+      - lake_oswego_house
+    occasions:
+      - christmas
+    tags:
+      - vhs
+      - digitized
+    duration: 00:07:50
+    file: videos/home_videos/1997_filet_of_soul.mp4
+
+  - id: pearly_test
+    title: Testing, Testing, Pearly
+    media_type: home_video
+    collection: Family Movies
+    people:
+      - mom
+    pets:
+      - pearly
+    locations:
+      - lake_oswego_house
+    occasions:
+      - unknown
+    tags:
+      - vhs
+      - digitized
+    duration: 00:00:23
+    file: videos/home_videos/pearly_test.mp4
+
+  - id: gillian_summer_camp_play
+    title: Gillian's Summer Camp Play
+    media_type: home_video
+    collection: Family Movies
+    people:
+      - gillian
+    locations:
+      - bryant
+    occasions:
+      - school_play
+    tags:
+      - vhs
+      - digitized
+    duration: 00:39:01
+    file: videos/home_videos/gillian_summer_camp_play.mp4
+
+  - id: mighty_mouse_saves_the_day
+    title: Mighty Mouse Saves the Day
+    media_type: home_video
+    collection: Family Movies
+    people:
+      - gillian
+      - betty
+      - caroline
+      - john
+      - max
+      - emma
+      - joey
+    locations:
+      - napa_house
+    occasions:
+      - family_get_together
+    tags:
+      - vhs
+      - digitized
+    duration: 00:08:17
+    file: videos/home_videos/mighty_mouse_saves_the_day.mp4
+
+  - id: laa_laa_and_po_mischief
+    title: Laa Laa and Po Mischief
+    media_type: home_video
+    collection: Family Movies
+    people:
+      - mom
+      - gillian
+      - john
+    pets:
+      - laa_laa
+      - po
+    locations:
+      - lake_oswego_house
+    occasions:
+      - miscellaneous
+    tags:
+      - vhs
+      - digitized
+    duration: 00:16:02
+    file: videos/home_videos/laa_laa_and_po_mischief.mp4

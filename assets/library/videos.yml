@@ -1,22 +1,65 @@
 videos:
-  - id: christmas_1995_lake_oswego_papa_betty_buddy
-    title: Christmas 1995 at Lake Oswego
+  - id: july_4_1996
+    title: July 4th, 1996
     media_type: home_video
     collection: Family Movies
-    date: 1995-12-25
-    year: 1995
+    date: 1996-07-04
+    year: 1996
     people:
-      - papa
-      - betty
-    pets:
-      - buddy
+      - gillian
+      - john
+      - mom
     locations:
-      - lake_oswego_house
+      - unknown
     occasions:
-      - christmas
+      - 4th_of_july
     tags:
       - vhs
       - digitized
-      - test_clip
-    duration: 00:00:03
-    file: videos/test_video.mp4
+    duration: 00:00:54
+    file: videos/home_videos/1996/4th_of_july/july_4_1996.mp4
+
+  - id: july_6_1996
+    title: July 6th, 1996
+    media_type: home_video
+    collection: Family Movies
+    date: 1996-07-06
+    year: 1996
+    people:
+      - gillian
+      - caroline
+      - john
+      - mom
+      - dad
+      - nanny
+      - papa
+      - betty
+    locations:
+      - napa_house
+    occasions:
+      - family_get_together
+    tags:
+      - vhs
+      - digitized
+    duration: 00:10:13
+    file: videos/home_videos/july_6th_1996.mp4
+
+  - id: caroline_in_empty_pool
+    title: Caroline in Empty Pool
+    media_type: home_video
+    collection: Family Movies
+    year: 1996
+    people:
+      - caroline
+      - john
+      - mom
+      - gillian
+    locations:
+      - lake_oswego_house
+    occasions:
+      - miscellaneous
+    tags:
+      - vhs
+      - digitized
+    duration: 00:03:16
+    file: videos/home_videos/caroline_in_empty_pool.mp4

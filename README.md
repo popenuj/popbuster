@@ -433,8 +433,7 @@ Use stable lowercase ids with underscores for people, pets, locations, occasions
 
 ```yaml
 people:
-  papa:
-    display_name: Papa
+  papa: Papa
 ```
 
 Use `unknown` when you cannot identify a value and `miscellaneous` when the value is known but not specific enough to deserve its own category yet. Locations and occasions both include those defaults.

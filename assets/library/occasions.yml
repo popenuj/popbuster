@@ -1,9 +1,7 @@
 occasions:
-  unknown:
-    display_name: Unknown Occasion
-
-  miscellaneous:
-    display_name: Miscellaneous
-
-  christmas:
-    display_name: Christmas
+  4th_of_july: 4th of July
+  family_get_together: Family Get Together
+  unknown: Unknown Occasion
+  miscellaneous: Miscellaneous
+  christmas: Christmas
+  school_play: School Play

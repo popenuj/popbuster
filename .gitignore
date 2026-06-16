@@ -8,3 +8,6 @@ __pycache__/
 # Original/generated splash source art. Normalized Plymouth frames live in support/plymouth/.
 assets/splash_screens/antenna_fixing/
 assets/splash_screens/ken_tv_unboxing/
+
+# Real digitized home-video clips are local media assets, not source code.
+assets/videos/home_videos/

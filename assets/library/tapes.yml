@@ -1,27 +1,18 @@
 tapes:
-  - id: christmas
-    title: Christmas Tape
-    rfid_payload: popbuster:tape:christmas
+  - id: july_4
+    title: 4th of July Tape
+    rfid_payload: popbuster:tape:july_4
     filters:
       media_type:
         - home_video
       occasions:
-        - christmas
+        - 4th_of_july
 
-  - id: christmas_1995
-    title: Christmas 1995
-    rfid_payload: popbuster:tape:christmas_1995
+  - id: family_1996
+    title: Family 1996
+    rfid_payload: popbuster:tape:family_1996
     filters:
       media_type:
         - home_video
-      occasions:
-        - christmas
       year:
-        - 1995
-
-  - id: buddy
-    title: Buddy Tape
-    rfid_payload: popbuster:tape:buddy
-    filters:
-      pets:
-        - buddy
+        - 1996

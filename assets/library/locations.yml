@@ -1,9 +1,5 @@
 locations:
-  unknown:
-    display_name: Unknown Location
-
-  miscellaneous:
-    display_name: Miscellaneous Location
-
-  lake_oswego_house:
-    display_name: Lake Oswego House
+  unknown: Unknown Location
+  miscellaneous: Miscellaneous Location
+  lake_oswego_house: Lake Oswego House
+  napa_house: Nanny and Papa's Napa House

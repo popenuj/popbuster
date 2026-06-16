@@ -180,9 +180,15 @@ def _read_yaml(path: Path) -> dict[str, Any]:
 def _read_display_names(path: Path, root_key: str) -> dict[str, str]:
     raw_items = _read_yaml(path).get(root_key, {})
     return {
-        str(item_id): str(raw_item.get("display_name", item_id))
+        str(item_id): _display_name_from_lookup(item_id, raw_item)
         for item_id, raw_item in raw_items.items()
     }
+
+
+def _display_name_from_lookup(item_id: Any, raw_item: Any) -> str:
+    if isinstance(raw_item, dict):
+        return str(raw_item.get("display_name", item_id))
+    return str(raw_item)
 
 
 def _video_to_tape(raw: dict[str, Any], project_root: Path) -> Tape:

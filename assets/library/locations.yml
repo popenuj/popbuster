@@ -1,3 +1,9 @@
 locations:
+  unknown:
+    display_name: Unknown Location
+
+  miscellaneous:
+    display_name: Miscellaneous Location
+
   lake_oswego_house:
     display_name: Lake Oswego House

@@ -29,6 +29,7 @@ DURATION_PATTERN = re.compile(r"^\d{2}:\d{2}:\d{2}$")
 REFERENCE_FIELDS = {
     "people": "people.yml",
     "locations": "locations.yml",
+    "occasions": "occasions.yml",
     "pets": "pets.yml",
 }
 REQUIRED_VIDEO_FIELDS = ("id", "title", "media_type", "year", "file")
@@ -45,6 +46,7 @@ def main() -> int:
     lookups = {
         "people": read_yaml(library_dir / "people.yml").get("people", {}),
         "locations": read_yaml(library_dir / "locations.yml").get("locations", {}),
+        "occasions": read_yaml(library_dir / "occasions.yml").get("occasions", {}),
         "pets": read_yaml(library_dir / "pets.yml").get("pets", {}),
     }
 

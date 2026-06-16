@@ -73,6 +73,7 @@ class TapeCatalog:
         display_names = {
             "people": _read_display_names(library_dir / "people.yml", "people"),
             "locations": _read_display_names(library_dir / "locations.yml", "locations"),
+            "occasions": _read_display_names(library_dir / "occasions.yml", "occasions"),
             "pets": _read_display_names(library_dir / "pets.yml", "pets"),
         }
 

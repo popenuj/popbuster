@@ -406,6 +406,7 @@ assets/library/videos.yml
 assets/library/tapes.yml
 assets/library/people.yml
 assets/library/locations.yml
+assets/library/occasions.yml
 assets/library/pets.yml
 ```
 
@@ -436,6 +437,8 @@ people:
     display_name: Papa
 ```
 
+Use `unknown` when you cannot identify a value and `miscellaneous` when the value is known but not specific enough to deserve its own category yet. Locations and occasions both include those defaults.
+
 `tapes.yml` defines curated physical tapes as filters over `videos.yml`:
 
 ```yaml
@@ -456,7 +459,7 @@ After editing the library, validate it from the project root:
 scripts/validate-library
 ```
 
-Validation fails on duplicate IDs, missing video files, bad people/location/pet references, unknown tape filter fields, and tape filters that resolve to zero available videos.
+Validation fails on duplicate IDs, missing video files, bad people/location/occasion/pet references, unknown tape filter fields, and tape filters that resolve to zero available videos.
 
 ## Video
 
@@ -483,6 +486,19 @@ scripts/cut-clip captures/vhs_01_full.mkv 00:12:15 00:02:30 assets/videos/home_v
 ```
 
 The script creates the output folder, trims the selected segment, and normalizes the result to Popbuster's 800x480 H.264/AAC playback format. Keep the full tape capture untouched as the archive master.
+
+Suggested clip paths:
+
+```text
+assets/videos/home_videos/<year>/<occasion>/<clip_id>.mp4
+```
+
+Use `unknown` or `miscellaneous` in the path when the occasion is not clear:
+
+```text
+assets/videos/home_videos/1995/unknown/clip_001.mp4
+assets/videos/home_videos/1995/miscellaneous/backyard_summer.mp4
+```
 
 ## Commercials
 

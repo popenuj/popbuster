@@ -1,0 +1,9 @@
+occasions:
+  unknown:
+    display_name: Unknown Occasion
+
+  miscellaneous:
+    display_name: Miscellaneous
+
+  christmas:
+    display_name: Christmas

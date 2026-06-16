@@ -10,33 +10,214 @@ if [[ ! -x "${PYTHON_BIN}" ]]; then
 fi
 
 "${PYTHON_BIN}" - "${PROJECT_ROOT}" <<'PY'
+from __future__ import annotations
+
+from collections import Counter
 from pathlib import Path
+import re
 import sys
+from typing import Any
 
 import yaml
 
-from popbuster.catalog import TapeCatalog
+from popbuster.catalog import FILTER_FIELDS, TapeCatalog
 
-project_root = Path(sys.argv[1])
-library_dir = project_root / "assets" / "library"
-catalog = TapeCatalog.from_library(library_dir)
-videos = catalog.available()
 
-print(f"Loaded {len(videos)} available video(s).")
-for video in videos:
-    print(f"- {video.id}: {video.title} [{video.video_path}]")
+ID_PATTERN = re.compile(r"^[a-z0-9_]+$")
+DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+DURATION_PATTERN = re.compile(r"^\d{2}:\d{2}:\d{2}$")
+REFERENCE_FIELDS = {
+    "people": "people.yml",
+    "locations": "locations.yml",
+    "pets": "pets.yml",
+}
+REQUIRED_VIDEO_FIELDS = ("id", "title", "media_type", "year", "file")
+REQUIRED_TAPE_FIELDS = ("id", "title", "filters")
 
-print()
-print("Filter categories:")
-for category in catalog.filter_categories():
-    values = ", ".join(f"{value.title} ({value.count})" for value in category.values)
-    print(f"- {category.title}: {values}")
 
-print()
-print("Tape filters:")
-raw_tapes = yaml.safe_load((library_dir / "tapes.yml").read_text(encoding="utf-8")) or {}
-for raw_tape in raw_tapes.get("tapes", []):
-    tape_id = raw_tape["id"]
-    queue = catalog.queue_for_tape(tape_id)
-    print(f"- {tape_id}: {len(queue)} video(s)")
+def main() -> int:
+    project_root = Path(sys.argv[1])
+    library_dir = project_root / "assets" / "library"
+    errors: list[str] = []
+
+    raw_videos = read_yaml(library_dir / "videos.yml").get("videos", [])
+    raw_tapes = read_yaml(library_dir / "tapes.yml").get("tapes", [])
+    lookups = {
+        "people": read_yaml(library_dir / "people.yml").get("people", {}),
+        "locations": read_yaml(library_dir / "locations.yml").get("locations", {}),
+        "pets": read_yaml(library_dir / "pets.yml").get("pets", {}),
+    }
+
+    validate_video_records(raw_videos, lookups, project_root, errors)
+    validate_tape_records(raw_tapes, errors)
+
+    if not errors:
+        catalog = TapeCatalog.from_library(library_dir)
+        validate_tape_resolution(catalog, raw_tapes, errors)
+
+    if errors:
+        print("Library validation failed:")
+        for error in errors:
+            print(f"- {error}")
+        return 1
+
+    catalog = TapeCatalog.from_library(library_dir)
+    videos = catalog.available()
+
+    print(f"Loaded {len(videos)} available video(s).")
+    for video in videos:
+        print(f"- {video.id}: {video.title} [{video.video_path}]")
+
+    print()
+    print("Filter categories:")
+    for category in catalog.filter_categories():
+        values = ", ".join(f"{value.title} ({value.count})" for value in category.values)
+        print(f"- {category.title}: {values}")
+
+    print()
+    print("Tape filters:")
+    for raw_tape in raw_tapes:
+        tape_id = raw_tape["id"]
+        queue = catalog.queue_for_tape(tape_id)
+        print(f"- {tape_id}: {len(queue)} video(s)")
+
+    print()
+    print("Library validation passed.")
+    return 0
+
+
+def read_yaml(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+
+
+def validate_video_records(
+    raw_videos: list[dict[str, Any]],
+    lookups: dict[str, dict[str, Any]],
+    project_root: Path,
+    errors: list[str],
+) -> None:
+    ids = [str(video.get("id", "")) for video in raw_videos]
+    add_duplicate_errors("video", ids, errors)
+
+    for index, video in enumerate(raw_videos, start=1):
+        label = str(video.get("id") or f"video #{index}")
+        for field_name in REQUIRED_VIDEO_FIELDS:
+            if field_name not in video:
+                errors.append(f"{label}: missing required field '{field_name}'")
+
+        video_id = video.get("id")
+        if video_id is not None:
+            validate_id("video", str(video_id), errors)
+
+        file_value = video.get("file")
+        if file_value:
+            video_path = Path(str(file_value))
+            if not video_path.is_absolute():
+                video_path = project_root / "assets" / video_path
+            if not video_path.exists():
+                errors.append(f"{label}: video file not found: {video_path}")
+
+        year = video.get("year")
+        if year is not None and not is_int_like(year):
+            errors.append(f"{label}: year must be an integer")
+
+        date = video.get("date")
+        if date is not None and not DATE_PATTERN.match(str(date)):
+            errors.append(f"{label}: date should use YYYY-MM-DD")
+
+        duration = video.get("duration")
+        if duration is not None and not DURATION_PATTERN.match(str(duration)):
+            errors.append(f"{label}: duration should use HH:MM:SS")
+
+        for field_name, lookup_file in REFERENCE_FIELDS.items():
+            validate_references(label, field_name, lookup_file, video.get(field_name), lookups, errors)
+
+
+def validate_tape_records(raw_tapes: list[dict[str, Any]], errors: list[str]) -> None:
+    ids = [str(tape.get("id", "")) for tape in raw_tapes]
+    add_duplicate_errors("tape", ids, errors)
+
+    for index, tape in enumerate(raw_tapes, start=1):
+        label = str(tape.get("id") or f"tape #{index}")
+        for field_name in REQUIRED_TAPE_FIELDS:
+            if field_name not in tape:
+                errors.append(f"{label}: missing required field '{field_name}'")
+
+        tape_id = tape.get("id")
+        if tape_id is not None:
+            validate_id("tape", str(tape_id), errors)
+
+        filters = tape.get("filters", {})
+        if not isinstance(filters, dict) or not filters:
+            errors.append(f"{label}: filters must be a non-empty mapping")
+            continue
+
+        for field_name, values in filters.items():
+            if field_name not in FILTER_FIELDS:
+                errors.append(f"{label}: unknown filter field '{field_name}'")
+            if not as_list(values):
+                errors.append(f"{label}: filter '{field_name}' must have at least one value")
+
+
+def validate_tape_resolution(
+    catalog: TapeCatalog,
+    raw_tapes: list[dict[str, Any]],
+    errors: list[str],
+) -> None:
+    for tape in raw_tapes:
+        tape_id = str(tape.get("id", ""))
+        if not tape_id:
+            continue
+        if not catalog.queue_for_tape(tape_id):
+            errors.append(f"{tape_id}: tape filter resolves to zero available videos")
+
+
+def validate_references(
+    label: str,
+    field_name: str,
+    lookup_file: str,
+    values: Any,
+    lookups: dict[str, dict[str, Any]],
+    errors: list[str],
+) -> None:
+    lookup = lookups[field_name]
+    for value in as_list(values):
+        value_id = str(value)
+        validate_id(field_name, value_id, errors)
+        if value_id not in lookup:
+            errors.append(f"{label}: unknown {field_name} id '{value_id}' in {lookup_file}")
+
+
+def add_duplicate_errors(kind: str, ids: list[str], errors: list[str]) -> None:
+    for item_id, count in sorted(Counter(ids).items()):
+        if item_id and count > 1:
+            errors.append(f"duplicate {kind} id '{item_id}'")
+
+
+def validate_id(kind: str, item_id: str, errors: list[str]) -> None:
+    if not ID_PATTERN.match(item_id):
+        errors.append(f"{kind} id '{item_id}' should use lowercase letters, numbers, and underscores")
+
+
+def as_list(values: Any) -> list[Any]:
+    if values is None:
+        return []
+    if isinstance(values, list):
+        return values
+    if isinstance(values, tuple):
+        return list(values)
+    return [values]
+
+
+def is_int_like(value: Any) -> bool:
+    try:
+        int(value)
+    except (TypeError, ValueError):
+        return False
+    return True
+
+
+raise SystemExit(main())
 PY

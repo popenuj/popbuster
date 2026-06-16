@@ -33,7 +33,7 @@ REFERENCE_FIELDS = {
     "pets": "pets.yml",
 }
 REQUIRED_VIDEO_FIELDS = ("id", "title", "media_type", "file")
-REQUIRED_TAPE_FIELDS = ("id", "title", "filters")
+REQUIRED_TAPE_FIELDS = ("id", "title")
 
 
 def main() -> int:
@@ -50,7 +50,7 @@ def main() -> int:
         "pets": read_yaml(library_dir / "pets.yml").get("pets", {}),
     }
 
-    validate_video_records(raw_videos, lookups, project_root, errors)
+    validate_video_records(raw_videos, raw_tapes, lookups, project_root, errors)
     validate_tape_records(raw_tapes, errors)
 
     if not errors:
@@ -96,12 +96,14 @@ def read_yaml(path: Path) -> dict[str, Any]:
 
 def validate_video_records(
     raw_videos: list[dict[str, Any]],
+    raw_tapes: list[dict[str, Any]],
     lookups: dict[str, dict[str, Any]],
     project_root: Path,
     errors: list[str],
 ) -> None:
     ids = [str(video.get("id", "")) for video in raw_videos]
     add_duplicate_errors("video", ids, errors)
+    tape_ids = {str(tape.get("id")) for tape in raw_tapes if tape.get("id")}
 
     for index, video in enumerate(raw_videos, start=1):
         label = str(video.get("id") or f"video #{index}")
@@ -133,6 +135,17 @@ def validate_video_records(
         if duration is not None and not DURATION_PATTERN.match(str(duration)):
             errors.append(f"{label}: duration should use HH:MM:SS")
 
+        recapture = video.get("recapture")
+        if recapture is not None and not isinstance(recapture, bool):
+            errors.append(f"{label}: recapture must be true or false")
+
+        tape_id = video.get("tape_id")
+        if tape_id is not None:
+            tape_id = str(tape_id)
+            validate_id("tape", tape_id, errors)
+            if tape_id not in tape_ids:
+                errors.append(f"{label}: unknown tape_id '{tape_id}' in tapes.yml")
+
         for field_name, lookup_file in REFERENCE_FIELDS.items():
             validate_references(label, field_name, lookup_file, video.get(field_name), lookups, errors)
 
@@ -151,7 +164,14 @@ def validate_tape_records(raw_tapes: list[dict[str, Any]], errors: list[str]) ->
         if tape_id is not None:
             validate_id("tape", str(tape_id), errors)
 
-        filters = tape.get("filters", {})
+        recapture = tape.get("recapture")
+        if recapture is not None and not isinstance(recapture, bool):
+            errors.append(f"{label}: recapture must be true or false")
+
+        filters = tape.get("filters")
+        source_type = str(tape.get("source_type", "curated"))
+        if filters is None and source_type == "physical_vhs":
+            continue
         if not isinstance(filters, dict) or not filters:
             errors.append(f"{label}: filters must be a non-empty mapping")
             continue
@@ -171,6 +191,8 @@ def validate_tape_resolution(
     for tape in raw_tapes:
         tape_id = str(tape.get("id", ""))
         if not tape_id:
+            continue
+        if tape.get("filters") is None and str(tape.get("source_type", "curated")) == "physical_vhs":
             continue
         if not catalog.queue_for_tape(tape_id):
             errors.append(f"{tape_id}: tape filter resolves to zero available videos")

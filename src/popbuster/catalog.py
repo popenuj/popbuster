@@ -25,7 +25,10 @@ class Tape:
     collection: str
     video_path: Path
     media_type: str = "home_video"
+    tape_id: str | None = None
     year: int | None = None
+    tape_name: str | None = None
+    recapture: bool = False
     people: tuple[str, ...] = field(default_factory=tuple)
     locations: tuple[str, ...] = field(default_factory=tuple)
     occasions: tuple[str, ...] = field(default_factory=tuple)
@@ -37,6 +40,7 @@ class Tape:
 class TapeDefinition:
     id: str
     title: str
+    source_type: str
     filters: dict[str, tuple[Any, ...]]
 
 
@@ -85,6 +89,7 @@ class TapeCatalog:
             TapeDefinition(
                 id=str(raw_tape["id"]),
                 title=str(raw_tape["title"]),
+                source_type=str(raw_tape.get("source_type", "curated")),
                 filters=_normalize_filters(raw_tape.get("filters", {})),
             )
             for raw_tape in raw_tapes
@@ -122,6 +127,8 @@ class TapeCatalog:
         tape_definition = self._tape_definitions.get(tape_id)
         if tape_definition is None:
             return []
+        if not tape_definition.filters:
+            return [tape for tape in self.available() if tape.tape_id == tape_id]
         return self.filter_videos(tape_definition.filters)
 
     def first_available(self) -> Tape | None:
@@ -202,7 +209,10 @@ def _video_to_tape(raw: dict[str, Any], project_root: Path) -> Tape:
         collection=str(raw.get("collection", raw.get("media_type", "Home Videos"))),
         video_path=video_path,
         media_type=str(raw.get("media_type", "home_video")),
+        tape_id=_optional_string(raw.get("tape_id")),
         year=_optional_int(raw.get("year")),
+        tape_name=_optional_string(raw.get("tape_name")),
+        recapture=bool(raw.get("recapture", False)),
         people=_string_tuple(raw.get("people", ())),
         locations=_string_tuple(raw.get("locations", ())),
         occasions=_string_tuple(raw.get("occasions", raw.get("categories", ()))),
@@ -261,3 +271,9 @@ def _optional_int(value: Any) -> int | None:
     if value is None:
         return None
     return int(value)
+
+
+def _optional_string(value: Any) -> str | None:
+    if value is None:
+        return None
+    return str(value)

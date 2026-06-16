@@ -1,18 +1,23 @@
 tapes:
-  - id: july_4
-    title: 4th of July Tape
-    rfid_payload: popbuster:tape:july_4
-    filters:
-      media_type:
-        - home_video
-      occasions:
-        - 4th_of_july
+  - id: rinaldi_popenuck_1996
+    title: Rinaldi Popenuck 1996
+    tape_name: |-
+      RINALDI POPENUCK
+      1996 -
+    source_type: physical_vhs
+    recapture: false
 
-  - id: family_1996
-    title: Family 1996
-    rfid_payload: popbuster:tape:family_1996
-    filters:
-      media_type:
-        - home_video
-      year:
-        - 1996
+  - id: rinaldi_popenuck_april_1990
+    title: Rinaldi Popenuck April 1990
+    tape_name: |-
+      RINALDI POPENUCK
+      APRIL 1990 -
+    source_type: physical_vhs
+    recapture: true
+
+  - id: rinaldi_popenuck_nov_1990
+    title: Rinaldi Popenuck November 1990
+    tape_name: |-
+      RINALDI POPENUCK
+      NOV. 1990 -
+    source_type: physical_vhs

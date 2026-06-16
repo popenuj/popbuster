@@ -415,9 +415,11 @@ assets/library/pets.yml
 ```yaml
 videos:
   - id: christmas_1995_lake_oswego_papa_betty_buddy
+    tape_id: rinaldi_popenuck_1996
     title: Christmas 1995 at Lake Oswego
     media_type: home_video
     collection: Family Movies
+    recapture: false
     date: 1995-12-25
     year: 1995
     people: [papa, betty]
@@ -440,7 +442,22 @@ Use `unknown` when you cannot identify a value and `miscellaneous` when the valu
 
 `date` and `year` are optional. Add them when the recording or surrounding context makes them trustworthy; omit them when the clip is undated. Undated clips still play and appear in people/place/occasion filters, but they do not appear in the Year filter.
 
-`tapes.yml` defines curated physical tapes as filters over `videos.yml`:
+`tape_id` is optional and links a clip back to a source tape in `tapes.yml`. `recapture` is optional and defaults to `false`; set it to `true` when the clip is usable but should be tried again because of tracking, sync drift, audio, or other capture problems.
+
+`tapes.yml` can define physical VHS source tapes or future curated playback tapes. Physical source tapes preserve the real tape label and can derive their clips from `videos.yml` records with a matching `tape_id`:
+
+```yaml
+tapes:
+  - id: rinaldi_popenuck_1996
+    title: Rinaldi Popenuck 1996
+    tape_name: |-
+      RINALDI POPENUCK
+      1996 -
+    source_type: physical_vhs
+    recapture: false
+```
+
+Curated tapes use filters over `videos.yml`:
 
 ```yaml
 tapes:

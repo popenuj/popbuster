@@ -2,17 +2,59 @@
 set -euo pipefail
 
 if [[ $# -ne 4 ]]; then
-  echo "Usage: scripts/cut-clip INPUT START DURATION OUTPUT" >&2
-  echo "Example: scripts/cut-clip captures/vhs_01.mkv 00:12:15 00:02:30 assets/videos/home_videos/1995/christmas/papa_betty_buddy.mp4" >&2
+  echo "Usage: scripts/cut-clip INPUT START STOP OUTPUT" >&2
+  echo "Example: scripts/cut-clip captures/vhs_01.mkv 00:12:15 00:14:45 assets/videos/home_videos/1995/christmas/papa_betty_buddy.mp4" >&2
   exit 2
 fi
 
 input="$1"
 start="$2"
-duration="$3"
+stop="$3"
 output="$4"
 output_dir="$(dirname "${output}")"
-tmp_output="$(mktemp "${TMPDIR:-/tmp}/popbuster-clip.XXXXXX.mp4")"
+
+duration="$(
+  python3 - "${start}" "${stop}" <<'PY'
+from decimal import Decimal, InvalidOperation
+import sys
+
+
+def parse_time(value: str) -> Decimal:
+    parts = value.split(":")
+    if len(parts) > 3:
+        raise ValueError("expected SS, MM:SS, or HH:MM:SS")
+    total = Decimal("0")
+    for part in parts:
+        if not part:
+            raise ValueError("empty time component")
+        try:
+            component = Decimal(part)
+        except InvalidOperation as error:
+            raise ValueError(f"invalid time component: {part}") from error
+        total = total * 60 + component
+    return total
+
+
+try:
+    start = parse_time(sys.argv[1])
+    stop = parse_time(sys.argv[2])
+except ValueError as error:
+    print(f"Invalid timestamp: {error}", file=sys.stderr)
+    raise SystemExit(2)
+
+duration = stop - start
+if duration <= 0:
+    print("STOP must be later than START.", file=sys.stderr)
+    raise SystemExit(2)
+
+print(duration)
+PY
+)"
+
+tmp_base="$(mktemp "${TMPDIR:-/tmp}/popbuster-clip.XXXXXX")"
+tmp_output="${tmp_base}.mp4"
+rm -f "${tmp_base}"
+trap 'rm -f "${tmp_output}"' EXIT
 
 mkdir -p "${output_dir}"
 
@@ -34,3 +76,4 @@ ffmpeg -y \
   "${tmp_output}"
 
 mv "${tmp_output}" "${output}"
+trap - EXIT

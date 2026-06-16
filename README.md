@@ -479,13 +479,13 @@ Pi playback is most reliable with 800x480 H.264 MP4 files. The app decodes video
 scripts/transcode-video input.mov assets/videos/test_video.mp4
 ```
 
-To cut a Popbuster-ready clip from a full VHS capture, provide the input capture, start time, duration, and output path:
+To cut a Popbuster-ready clip from a full VHS capture, provide the input capture, start time, stop time, and output path:
 
 ```bash
-scripts/cut-clip captures/vhs_01_full.mkv 00:12:15 00:02:30 assets/videos/home_videos/1995/christmas/papa_betty_buddy.mp4
+scripts/cut-clip captures/vhs_01_full.mkv 00:12:15 00:14:45 assets/videos/home_videos/1995/christmas/papa_betty_buddy.mp4
 ```
 
-The script creates the output folder, trims the selected segment, and normalizes the result to Popbuster's 800x480 H.264/AAC playback format. Keep the full tape capture untouched as the archive master.
+The script creates the output folder, trims the selected segment between those bounds, and normalizes the result to Popbuster's 800x480 H.264/AAC playback format. Keep the full tape capture untouched as the archive master.
 
 Suggested clip paths:
 

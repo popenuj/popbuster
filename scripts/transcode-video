@@ -8,10 +8,16 @@ fi
 
 input="$1"
 output="$2"
-tmp_output="$(mktemp "${TMPDIR:-/tmp}/popbuster-video.XXXXXX.mp4")"
+output_dir="$(dirname "${output}")"
+tmp_base="$(mktemp "${TMPDIR:-/tmp}/popbuster-video.XXXXXX")"
+tmp_output="${tmp_base}.mp4"
+rm -f "${tmp_base}"
+trap 'rm -f "${tmp_output}"' EXIT
+
+mkdir -p "${output_dir}"
 
 ffmpeg -y -i "${input}" \
-  -vf "scale=800:-2:flags=lanczos,pad=800:480:(ow-iw)/2:(oh-ih)/2:black,setsar=1" \
+  -vf "scale=800:480:force_original_aspect_ratio=decrease:flags=lanczos,pad=800:480:(ow-iw)/2:(oh-ih)/2:black,setsar=1" \
   -r 30 \
   -c:v libx264 \
   -profile:v main \
@@ -25,3 +31,4 @@ ffmpeg -y -i "${input}" \
   "${tmp_output}"
 
 mv "${tmp_output}" "${output}"
+trap - EXIT

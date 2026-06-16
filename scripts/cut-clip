@@ -62,7 +62,7 @@ ffmpeg -y \
   -ss "${start}" \
   -i "${input}" \
   -t "${duration}" \
-  -vf "scale=800:-2:flags=lanczos,pad=800:480:(ow-iw)/2:(oh-ih)/2:black,setsar=1" \
+  -vf "scale=800:480:force_original_aspect_ratio=decrease:flags=lanczos,pad=800:480:(ow-iw)/2:(oh-ih)/2:black,setsar=1" \
   -r 30 \
   -c:v libx264 \
   -profile:v main \

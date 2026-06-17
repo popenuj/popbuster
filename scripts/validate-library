@@ -120,7 +120,7 @@ def validate_video_records(
             video_path = Path(str(file_value))
             if not video_path.is_absolute():
                 video_path = project_root / "assets" / video_path
-            if not video_path.exists():
+            if not video_path.is_file():
                 errors.append(f"{label}: video file not found: {video_path}")
 
         year = video.get("year")

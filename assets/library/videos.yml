@@ -18,7 +18,7 @@ videos:
       - vhs
       - digitized
     duration: 00:00:54
-    file: videos/home_videos/1996/4th_of_july/july_4_1996.mp4
+    file: videos/home_videos/rinaldi_popenuck_1996/july_4_1996.mp4
 
   - id: july_6_1996
     tape_id: rinaldi_popenuck_1996
@@ -44,7 +44,7 @@ videos:
       - vhs
       - digitized
     duration: 00:10:13
-    file: videos/home_videos/july_6th_1996.mp4
+    file: videos/home_videos/rinaldi_popenuck_1996/july_6th_1996.mp4
 
   - id: caroline_in_empty_pool
     tape_id: rinaldi_popenuck_1996
@@ -65,7 +65,7 @@ videos:
       - vhs
       - digitized
     duration: 00:03:16
-    file: videos/home_videos/caroline_in_empty_pool.mp4
+    file: videos/home_videos/rinaldi_popenuck_1996/caroline_in_empty_pool.mp4
 
   - id: 1996_betty_christmas_play
     tape_id: rinaldi_popenuck_1996
@@ -84,7 +84,7 @@ videos:
       - vhs
       - digitized
     duration: 00:05:25
-    file: videos/home_videos/1996_betty_christmas_play.mp4
+    file: videos/home_videos/rinaldi_popenuck_1996/1996_betty_christmas_play.mp4
 
   - id: 1996_gillian_christmas_play
     tape_id: rinaldi_popenuck_1996
@@ -103,7 +103,7 @@ videos:
       - vhs
       - digitized
     duration: 00:04:22
-    file: videos/home_videos/1996_gillian_christmas_play.mp4
+    file: videos/home_videos/rinaldi_popenuck_1996/1996_gillian_christmas_play.mp4
 
   - id: 1996_john_christmas_play
     tape_id: rinaldi_popenuck_1996
@@ -122,7 +122,7 @@ videos:
       - vhs
       - digitized
     duration: 00:02:09
-    file: videos/home_videos/1996_john_christmas_play.mp4
+    file: videos/home_videos/rinaldi_popenuck_1996/1996_john_christmas_play.mp4
 
   - id: 1996_john_badger_presentation
     tape_id: rinaldi_popenuck_1996
@@ -141,7 +141,7 @@ videos:
       - vhs
       - digitized
     duration: 00:01:21
-    file: videos/home_videos/1996_john_badger_presentation.mp4
+    file: videos/home_videos/rinaldi_popenuck_1996/1996_john_badger_presentation.mp4
 
   - id: 1996_christmas_day
     tape_id: rinaldi_popenuck_1996
@@ -167,7 +167,7 @@ videos:
       - vhs
       - digitized
     duration: 00:04:26
-    file: videos/home_videos/1996_christmas_day.mp4
+    file: videos/home_videos/rinaldi_popenuck_1996/1996_christmas_day.mp4
 
   - id: 1997_gillian_bday
     tape_id: rinaldi_popenuck_1996
@@ -191,7 +191,7 @@ videos:
       - vhs
       - digitized
     duration: 00:02:54
-    file: videos/home_videos/1997_gillian_bday.mp4
+    file: videos/home_videos/rinaldi_popenuck_1996/1997_gillian_bday.mp4
 
   - id: 1997_betty_bday
     tape_id: rinaldi_popenuck_1996
@@ -215,7 +215,7 @@ videos:
       - vhs
       - digitized
     duration: 00:07:03
-    file: videos/home_videos/1997_betty_bday.mp4
+    file: videos/home_videos/rinaldi_popenuck_1996/1997_betty_bday.mp4
 
   - id: betty_makes_a_whoopee
     tape_id: rinaldi_popenuck_1996
@@ -237,7 +237,7 @@ videos:
       - vhs
       - digitized
     duration: 00:01:26
-    file: videos/home_videos/betty_makes_a_whoopee.mp4
+    file: videos/home_videos/rinaldi_popenuck_1996/betty_makes_a_whoopee.mp4
 
   - id: 1997_caroline_bday
     tape_id: rinaldi_popenuck_1996
@@ -261,7 +261,7 @@ videos:
       - vhs
       - digitized
     duration: 00:06:48
-    file: videos/home_videos/1997_caroline_bday.mp4
+    file: videos/home_videos/rinaldi_popenuck_1996/1997_caroline_bday.mp4
 
   - id: 1997_filet_of_soul
     tape_id: rinaldi_popenuck_1996
@@ -287,7 +287,7 @@ videos:
       - vhs
       - digitized
     duration: 00:07:50
-    file: videos/home_videos/1997_filet_of_soul.mp4
+    file: videos/home_videos/rinaldi_popenuck_1996/1997_filet_of_soul.mp4
 
   - id: pearly_test
     tape_id: rinaldi_popenuck_1996
@@ -306,7 +306,7 @@ videos:
       - vhs
       - digitized
     duration: 00:00:23
-    file: videos/home_videos/pearly_test.mp4
+    file: videos/home_videos/rinaldi_popenuck_1996/pearly_test.mp4
 
   - id: gillian_summer_camp_play
     tape_id: rinaldi_popenuck_1996
@@ -323,7 +323,7 @@ videos:
       - vhs
       - digitized
     duration: 00:39:01
-    file: videos/home_videos/gillian_summer_camp_play.mp4
+    file: videos/home_videos/rinaldi_popenuck_1996/gillian_summer_camp_play.mp4
 
   - id: mighty_mouse_saves_the_day
     tape_id: rinaldi_popenuck_1996
@@ -346,7 +346,7 @@ videos:
       - vhs
       - digitized
     duration: 00:08:17
-    file: videos/home_videos/mighty_mouse_saves_the_day.mp4
+    file: videos/home_videos/rinaldi_popenuck_1996/mighty_mouse_saves_the_day.mp4
 
   - id: laa_laa_and_po_mischief
     tape_id: rinaldi_popenuck_1996
@@ -368,4 +368,258 @@ videos:
       - vhs
       - digitized
     duration: 00:16:02
-    file: videos/home_videos/laa_laa_and_po_mischief.mp4
+    file: videos/home_videos/rinaldi_popenuck_1996/laa_laa_and_po_mischief.mp4
+
+  - id: thanksgiving_1990
+    tape_id: rinaldi_popenuck_nov_1990
+    title: Thanksgiving 1990
+    media_type: home_video
+    collection: Family Movies
+    date: 1990-11-22
+    year: 1990
+    people:
+      - john
+      - nanny
+      - papa
+      - gillian
+      - betty
+      - mom
+      - dad
+    locations:
+      - napa_house
+    occasions:
+      - thanksgiving
+    tags:
+      - vhs
+      - digitized
+    duration: 00:25:12
+    file: videos/home_videos/rinaldi_popenuck_nov_1990/thanksgiving_1990.mp4
+
+  - id: christmas_1990
+    tape_id: rinaldi_popenuck_nov_1990
+    title: Christmas 1990
+    media_type: home_video
+    collection: Family Movies
+    date: 1990-12-25
+    year: 1990
+    people:
+      - mom
+      - john
+      - gillian
+      - nanny
+      - betty
+      - papa
+      - dad
+    locations:
+      - albany
+    occasions:
+      - christmas
+    tags:
+      - vhs
+      - digitized
+    duration: 00:15:01
+    file: videos/home_videos/rinaldi_popenuck_nov_1990/christmas_1990.mp4
+
+  - id: christmas_dinner_1990
+    tape_id: rinaldi_popenuck_nov_1990
+    title: Christmas Dinner 1990
+    media_type: home_video
+    collection: Family Movies
+    date: 1990-12-25
+    year: 1990
+    people:
+      - dad
+      - betty
+      - steve
+      - kris
+      - vincent
+      - papa
+      - gillian
+      - john
+      - gina
+      - lou
+      - lena
+      - jenny
+      - nanny
+      - mom
+    locations:
+      - jennys
+    occasions:
+      - christmas_dinner
+    tags:
+      - vhs
+      - digitized
+    duration: 00:19:16
+    file: videos/home_videos/rinaldi_popenuck_nov_1990/christmas_dinner_1990.mp4
+
+  - id: new_years_eve_1990
+    tape_id: rinaldi_popenuck_nov_1990
+    title: New Year's Eve 1990
+    media_type: home_video
+    collection: Family Movies
+    date: 1990-12-31
+    year: 1990
+    people:
+      - john
+      - gillian
+      - betty
+      - dad
+    locations:
+      - albany
+    occasions:
+      - new_years_eve
+    tags:
+      - vhs
+      - digitized
+    duration: 00:02:56
+    file: videos/home_videos/rinaldi_popenuck_nov_1990/new_years_eve_1990.mp4
+
+  - id: johns_3rd_bday
+    tape_id: rinaldi_popenuck_nov_1990
+    title: John's 3rd Birthday
+    media_type: home_video
+    collection: Family Movies
+    date: 1991-02-23
+    year: 1991
+    people:
+      - john
+      - walter
+      - anne
+      - nanny
+      - papa
+      - dad
+      - gillian
+      - vincent
+      - jessica
+      - jenny
+    locations:
+      - albany
+    occasions:
+      - birthdays
+    tags:
+      - vhs
+      - digitized
+    duration: 00:12:07
+    file: videos/home_videos/rinaldi_popenuck_nov_1990/johns_3rd_bday.mp4
+
+  - id: easter_1991
+    tape_id: rinaldi_popenuck_nov_1990
+    title: Easter 1991
+    media_type: home_video
+    collection: Family Movies
+    year: 1991
+    people:
+      - nanny
+      - steve
+      - vincent
+      - mom
+      - john
+      - jessica
+      - betty
+      - phoebe
+      - paul
+      - lena
+      - lou
+      - emma
+      - max
+      - theresa
+      - papa
+      - nanny
+    locations:
+      - jennys
+    occasions:
+      - easter
+    tags:
+      - vhs
+      - digitized
+    duration: 00:24:36
+    file: videos/home_videos/rinaldi_popenuck_nov_1990/easter_1991.mp4
+
+  - id: bettys_1st_bday
+    tape_id: rinaldi_popenuck_nov_1990
+    title: Betty's 1st Birthday
+    media_type: home_video
+    collection: Family Movies
+    date: 1991-04-12
+    year: 1991
+    people:
+      - betty
+      - mom
+      - dad
+      - john
+      - gillian
+    locations:
+      - albany
+    occasions:
+      - birthdays
+    tags:
+      - vhs
+      - digitized
+    duration: 00:04:15
+    file: videos/home_videos/rinaldi_popenuck_nov_1990/bettys_1st_bday.mp4
+
+  - id: mom_betty_napa_bday_party
+    tape_id: rinaldi_popenuck_nov_1990
+    title: Mom and Betty's Napa Birthday 1991
+    media_type: home_video
+    collection: Family Movies
+    year: 1991
+    people:
+      - nanny
+      - mom
+      - betty
+      - dad
+      - papa
+      - gillian
+      - john
+    locations:
+      - napa_house
+    occasions:
+      - birthdays
+    tags:
+      - vhs
+      - digitized
+    duration: 00:09:39
+    file: videos/home_videos/rinaldi_popenuck_nov_1990/mom_betty_napa_bday_party.mp4
+
+  - id: april_20_1991
+    tape_id: rinaldi_popenuck_nov_1990
+    title: April 20, 1991, Albany Backyard
+    media_type: home_video
+    collection: Family Movies
+    date: 1991-04-20
+    year: 1991
+    people:
+      - john
+      - gillian
+      - mom
+    locations:
+      - albany
+    occasions:
+      - miscellaneous
+    tags:
+      - vhs
+      - digitized
+    duration: 00:03:27
+    file: videos/home_videos/rinaldi_popenuck_nov_1990/april_20_1991.mp4
+
+  - id: april_21_1991
+    tape_id: rinaldi_popenuck_nov_1990
+    title: April 21, 1991, Albany
+    media_type: home_video
+    collection: Family Movies
+    date: 1991-04-21
+    year: 1991
+    people:
+      - dad
+      - papa
+      - john
+    locations:
+      - albany
+    occasions:
+      - miscellaneous
+    tags:
+      - vhs
+      - digitized
+    duration: 00:01:28
+    file: videos/home_videos/rinaldi_popenuck_nov_1990/april_21_1991.mp4

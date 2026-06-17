@@ -21,3 +21,11 @@ tapes:
       RINALDI POPENUCK
       NOV. 1990 -
     source_type: physical_vhs
+    recapture: false
+
+  - id: popenucks_december_1991_summer_1993
+    title: Popenucks December 1991 - Summer 1993
+    tape_name: |-
+      POPENUCKS
+      DECEMBER 1991 - SUMMER 1993
+    source_type: physical_vhs

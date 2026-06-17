@@ -24,7 +24,6 @@ from popbuster.resume import ResumeStore
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
-CATALOG_PATH = PROJECT_ROOT / "assets" / "tapes.json"
 LIBRARY_DIR = PROJECT_ROOT / "assets" / "library"
 FONT_PATH = PROJECT_ROOT / "assets" / "fonts" / "Modeseven-L3n5.ttf"
 APP_START_VIDEO_PATH = PROJECT_ROOT / "assets" / "videos" / "app_start.mp4"
@@ -477,9 +476,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def load_catalog() -> TapeCatalog:
-    if (LIBRARY_DIR / "videos.yml").exists():
-        return TapeCatalog.from_library(LIBRARY_DIR)
-    return TapeCatalog.from_json(CATALOG_PATH)
+    return TapeCatalog.from_library(LIBRARY_DIR)
 
 
 def run(argv: list[str] | None = None) -> int:

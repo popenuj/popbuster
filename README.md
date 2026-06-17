@@ -428,7 +428,7 @@ videos:
     occasions: [christmas]
     tags: [vhs, digitized]
     duration: 00:00:03
-    file: videos/test_video.mp4
+    file: videos/home_videos/rinaldi_popenuck_1996/christmas_1995_lake_oswego_papa_betty_buddy.mp4
 ```
 
 Use stable lowercase ids with underscores for people, pets, locations, occasions, and tags. The lookup files provide display names for menus:
@@ -469,8 +469,6 @@ tapes:
       occasions: [christmas]
 ```
 
-The current app still has a compatibility fallback for `assets/tapes.json`, but new clips should go into `assets/library/videos.yml`.
-
 After editing the library, validate it from the project root:
 
 ```bash
@@ -483,18 +481,10 @@ Validation fails on duplicate IDs, missing video files, bad people/location/occa
 
 For current development, the simulated DSI and HDMI windows mirror the same feed. At application startup, Popbuster plays `assets/videos/app_start.mp4` before the text boot/loading sequence when the opening jingle setting is on. If that file is missing or the setting is off, the app skips directly to the text boot sequence.
 
-For a real Popbuster test clip, place a video at:
-
-```text
-assets/videos/test_video.mp4
-```
-
-Then add or update its record in `assets/library/videos.yml`.
-
 Pi playback is most reliable with 800x480 H.264 MP4 files. The app decodes videos with QtMultimedia, then renders decoded frames into normal Qt image widgets instead of using `QVideoWidget`; this has been more reliable on the Pi DSI/Wayland path. Normalize generated or captured clips before adding them:
 
 ```bash
-scripts/transcode-video input.mov assets/videos/test_video.mp4
+scripts/transcode-video input.mov assets/videos/home_videos/example_clip.mp4
 ```
 
 To cut a Popbuster-ready clip from a full VHS capture, provide the input capture, start time, stop time, and output path:
@@ -541,7 +531,7 @@ Focus either Popbuster window and use:
 
 | Key | Action |
 | --- | --- |
-| `I` or `1` | Insert the demo tape |
+| `I` or `1` | Insert the first available tape |
 | `M` | Open menu |
 | `Up` / `Down` | Move menu selection |
 | `Right` or `Space` | Enter menu item; in settings, change selected setting immediately |

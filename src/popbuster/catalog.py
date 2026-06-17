@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable
@@ -95,25 +94,6 @@ class TapeCatalog:
             for raw_tape in raw_tapes
         ]
         return cls(tapes, tape_definitions, display_names)
-
-    @classmethod
-    def from_json(cls, path: Path) -> "TapeCatalog":
-        project_root = path.parent.parent
-        raw_tapes = json.loads(path.read_text(encoding="utf-8"))
-        tapes: list[Tape] = []
-        for raw in raw_tapes:
-            video_path = Path(raw["video_path"])
-            if not video_path.is_absolute():
-                video_path = (project_root / video_path).resolve()
-            tapes.append(
-                Tape(
-                    id=raw["id"],
-                    title=raw["title"],
-                    collection=raw["collection"],
-                    video_path=video_path,
-                )
-            )
-        return cls(tapes)
 
     def get(self, tape_id: str) -> Tape | None:
         queue = self.queue_for_tape(tape_id)

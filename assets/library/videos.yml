@@ -623,3 +623,627 @@ videos:
       - digitized
     duration: 00:01:28
     file: videos/home_videos/rinaldi_popenuck_nov_1990/april_21_1991.mp4
+
+  - id: christmas_1991
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Christmas 1991"
+    media_type: home_video
+    collection: "Family Movies"
+    date: 1991-12-25
+    year: 1991
+    people:
+      - gillian
+      - betty
+      - john
+      - dad
+      - mom
+    pets:
+      - pearly
+      - baba
+    locations:
+      - lake_oswego_house
+    occasions:
+      - christmas
+    tags:
+      - vhs
+      - digitized
+    duration: 00:50:15
+    file: videos/home_videos/popenucks_december_1991_summer_1993/christmas_1991.mp4
+    recapture: false
+
+  - id: biking_91
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Biking \u201891"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1991
+    people:
+      - gillian
+      - john
+      - betty
+      - dad
+    locations:
+      - lake_oswego_house
+    occasions:
+      - miscellaneous
+    tags:
+      - vhs
+      - digitized
+    duration: 00:03:02
+    file: videos/home_videos/popenucks_december_1991_summer_1993/biking_91.mp4
+    recapture: false
+
+  - id: gillians_6th_bday
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Gillian\u2019s 6th Birthday"
+    media_type: home_video
+    collection: "Family Movies"
+    date: 1992-01-10
+    year: 1992
+    people:
+      - gillian
+      - betty
+      - john
+      - dad
+      - mom
+    locations:
+      - lake_oswego_house
+    occasions:
+      - birthdays
+    tags:
+      - vhs
+      - digitized
+    duration: 00:07:41
+    file: videos/home_videos/popenucks_december_1991_summer_1993/gillians_6th_bday.mp4
+    recapture: false
+
+  - id: bettys_1992_bath
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Betty\u2019s \u201992 Bath"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1992
+    people:
+      - betty
+    locations:
+      - lake_oswego_house
+    occasions:
+      - miscellaneous
+    tags:
+      - vhs
+      - digitized
+    duration: 00:10:15
+    file: videos/home_videos/popenucks_december_1991_summer_1993/bettys_1992_bath.mp4
+    recapture: false
+
+  - id: johns_4th_bday
+    tape_id: popenucks_december_1991_summer_1993
+    title: "John\u2019s 4th Birthday"
+    media_type: home_video
+    collection: "Family Movies"
+    date: 1992-02-06
+    year: 1992
+    people:
+      - john
+      - betty
+      - gillian
+      - mom
+      - dad
+    locations:
+      - lake_oswego_house
+    occasions:
+      - birthdays
+    tags:
+      - vhs
+      - digitized
+    duration: 00:11:24
+    file: videos/home_videos/popenucks_december_1991_summer_1993/johns_4th_bday.mp4
+    recapture: false
+
+  - id: bettys_2nd_bday
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Betty's 2nd Birthday"
+    media_type: home_video
+    collection: "Family Movies"
+    date: 1992-04-12
+    year: 1992
+    people:
+      - john
+      - betty
+      - gillian
+      - mom
+      - dad
+    locations:
+      - lake_oswego_house
+    occasions:
+      - birthdays
+    tags:
+      - vhs
+      - digitized
+    duration: 00:10:58
+    file: videos/home_videos/popenucks_december_1991_summer_1993/bettys_2nd_bday.mp4
+    recapture: false
+
+  - id: easter_1992
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Easter 1992"
+    media_type: home_video
+    collection: "Family Movies"
+    date: 1992-04-19
+    year: 1992
+    people:
+      - john
+      - betty
+      - gillian
+      - mom
+      - dad
+    locations:
+      - washington
+    occasions:
+      - easter
+    tags:
+      - vhs
+      - digitized
+    duration: 00:03:00
+    file: videos/home_videos/popenucks_december_1991_summer_1993/easter_1992.mp4
+    recapture: false
+
+  - id: bryant_fest_1992
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Bryant Fest 1992"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1992
+    people:
+      - gillian
+      - mom
+      - john
+      - betty
+    locations:
+      - bryant
+    occasions:
+      - miscellaneous
+    tags:
+      - vhs
+      - digitized
+    duration: 00:09:01
+    file: videos/home_videos/popenucks_december_1991_summer_1993/bryant_fest_1992.mp4
+    recapture: false
+
+  - id: jazzercise_1992
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Jazzercise 1992"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1992
+    people:
+      - john
+      - betty
+    locations:
+      - unknown
+    occasions:
+      - miscellaneous
+    tags:
+      - vhs
+      - digitized
+    duration: 00:18:46
+    file: videos/home_videos/popenucks_december_1991_summer_1993/jazzercise_1992.mp4
+    recapture: false
+
+  - id: michaels_bday
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Michael\u2019s ? Birthday!"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1992
+    people:
+      - john
+      - betty
+      - gillian
+    locations:
+      - bryant
+    occasions:
+      - birthdays
+    tags:
+      - vhs
+      - digitized
+    duration: 00:04:16
+    file: videos/home_videos/popenucks_december_1991_summer_1993/michaels_bday.mp4
+    recapture: false
+
+  - id: gillians_1992_dance_recital
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Gillian's 1992 Dance Recital"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1992
+    people:
+      - gillian
+    locations:
+      - bryant
+    occasions:
+      - school_event
+    tags:
+      - vhs
+      - digitized
+    duration: 00:05:12
+    file: videos/home_videos/popenucks_december_1991_summer_1993/gillians_1992_dance_recital.mp4
+    recapture: false
+
+  - id: michaels_bday_again
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Michael\u2019s ? Birthday Again ?!"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1992
+    people:
+      - john
+      - betty
+      - gillian
+    locations:
+      - bryant
+    occasions:
+      - school_event
+    tags:
+      - vhs
+      - digitized
+    duration: 00:03:46
+    file: videos/home_videos/popenucks_december_1991_summer_1993/michaels_bday_again.mp4
+    recapture: false
+
+  - id: the_pauls_come_to_portland
+    tape_id: popenucks_december_1991_summer_1993
+    title: "The Pauls Come to Portland"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1992
+    people:
+      - john
+      - betty
+      - gillian
+      - emma
+      - max
+      - joey
+      - theresa
+      - paul
+      - dad
+    tags:
+      - vhs
+      - digitized
+    duration: 00:14:30
+    file: videos/home_videos/popenucks_december_1991_summer_1993/the_pauls_come_to_portland.mp4
+
+  - id: columbia
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Columbia, CA Trip"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1992
+    people:
+      - john
+      - betty
+      - gillian
+      - mom
+      - dad
+      - nanny
+      - papa
+    locations:
+      - columbia
+    occasions:
+      - miscellaneous
+    tags:
+      - vhs
+      - digitized
+    duration: 00:03:34
+    file: videos/home_videos/popenucks_december_1991_summer_1993/columbia.mp4
+    recapture: false
+
+  - id: twain_harte_92
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Twain Harte 1992"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1992
+    people:
+      - john
+      - betty
+      - gillian
+      - mom
+      - dad
+      - nanny
+      - papa
+    locations:
+      - twain_harte
+    occasions:
+      - miscellaneous
+    tags:
+      - vhs
+      - digitized
+    duration: 00:09:30
+    file: videos/home_videos/popenucks_december_1991_summer_1993/twain_harte_92.mp4
+    recapture: false
+
+  - id: family_get_together_92
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Family Get Together 1992, Napa"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1992
+    people:
+      - john
+      - betty
+      - gillian
+      - emma
+      - max
+      - joey
+      - theresa
+      - paul
+      - dad
+      - mom
+      - nanny
+      - papa
+      - jenny
+      - jessica
+      - vincent
+      - steve
+      - theresa
+      - lou
+      - lena
+    locations:
+      - napa_house
+    occasions:
+      - family_get_together
+    tags:
+      - vhs
+      - digitized
+    duration: 00:15:50
+    file: videos/home_videos/popenucks_december_1991_summer_1993/family_get_together_92.mp4
+    recapture: false
+
+  - id: lake_oswego_backyard
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Lake Oswego Backyard"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1992
+    people:
+      - john
+      - gillian
+      - mom
+    locations:
+      - lake_oswego_house
+    occasions:
+      - unknown
+    tags:
+      - vhs
+      - digitized
+    duration: 00:02:33
+    file: videos/home_videos/popenucks_december_1991_summer_1993/lake_oswego_backyard.mp4
+    recapture: false
+
+  - id: john_thanksgiving_song
+    tape_id: popenucks_december_1991_summer_1993
+    title: "John's Thanksgiving Song"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1992
+    people:
+      - john
+    locations:
+      - bryant
+    occasions:
+      - school_event
+    tags:
+      - vhs
+      - digitized
+    duration: 00:01:06
+    file: videos/home_videos/popenucks_december_1991_summer_1993/john_thanksgiving_song.mp4
+    recapture: false
+
+  - id: lake_oswegsnow_92
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Lake Oswego Snow \u201892"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1992
+    people:
+      - john
+      - gillian
+      - betty
+      - mom
+    locations:
+      - lake_oswego_house
+    occasions:
+      - miscellaneous
+    tags:
+      - vhs
+      - digitized
+    duration: 00:03:45
+    file: videos/home_videos/popenucks_december_1991_summer_1993/lake_oswegsnow_92.mp4
+    recapture: false
+
+  - id: christmas_eve_1992
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Christmas Eve 1992"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1992
+    people:
+      - john
+      - gillian
+      - nanny
+      - betty
+    pets:
+      - pearly
+      - baba
+    locations:
+      - lake_oswego_house
+    occasions:
+      - christmas_eve
+    tags:
+      - vhs
+      - digitized
+    duration: 00:15:13
+    file: videos/home_videos/popenucks_december_1991_summer_1993/christmas_eve_1992.mp4
+    recapture: false
+
+  - id: backyard_snow_92
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Backyard Snow \u201892"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1992
+    people:
+      - john
+      - gillian
+      - betty
+      - mom
+    locations:
+      - lake_oswego_house
+    occasions:
+      - miscellaneous
+    tags:
+      - vhs
+      - digitized
+    duration: 00:02:56
+    file: videos/home_videos/popenucks_december_1991_summer_1993/backyard_snow_92.mp4
+    recapture: false
+
+  - id: gillians_7th_bday
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Gillian\u2019s 7th Birthday"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1993
+    people:
+      - gillian
+      - betty
+      - mom
+      - john
+      - dad
+    locations:
+      - lake_oswego_house
+    occasions:
+      - birthdays
+    tags:
+      - vhs
+      - digitized
+    duration: 00:03:25
+    file: videos/home_videos/popenucks_december_1991_summer_1993/gillians_7th_bday.mp4
+    recapture: false
+
+  - id: johns_5th_bday
+    tape_id: popenucks_december_1991_summer_1993
+    title: "John\u2019s 5th Birthday"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1993
+    people:
+      - john
+      - betty
+      - gillian
+      - mom
+      - dad
+    locations:
+      - lake_oswego_house
+    occasions:
+      - birthdays
+    tags:
+      - vhs
+      - digitized
+    duration: 00:01:59
+    file: videos/home_videos/popenucks_december_1991_summer_1993/johns_5th_bday.mp4
+    recapture: false
+
+  - id: bettys_3rd_bday
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Betty's 3rd Birthday"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1993
+    people:
+      - betty
+      - mom
+      - john
+      - dad
+      - gillian
+    locations:
+      - lake_oswego_house
+    occasions:
+      - birthdays
+    tags:
+      - vhs
+      - digitized
+    duration: 00:10:40
+    file: videos/home_videos/popenucks_december_1991_summer_1993/bettys_3rd_bday.mp4
+    recapture: false
+
+  - id: bath_93
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Bath \u201893"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1993
+    people:
+      - john
+      - betty
+      - gillian
+    pets:
+      - pearly
+      - baba
+    locations:
+      - lake_oswego_house
+    occasions:
+      - miscellaneous
+    tags:
+      - vhs
+      - digitized
+    duration: 00:03:45
+    file: videos/home_videos/popenucks_december_1991_summer_1993/bath_93.mp4
+    recapture: false
+
+  - id: yard_time_93
+    tape_id: popenucks_december_1991_summer_1993
+    title: "Yard Time \u201893"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1993
+    people:
+      - john
+      - betty
+    pets:
+      - pearly
+      - baba
+    locations:
+      - lake_oswego_house
+    occasions:
+      - miscellaneous
+    tags:
+      - vhs
+      - digitized
+    duration: 00:03:46
+    file: videos/home_videos/popenucks_december_1991_summer_1993/yard_time_93.mp4
+    recapture: false
+
+  - id: 4th_of_july_1993
+    tape_id: popenucks_december_1991_summer_1993
+    title: "4th of July, 1993"
+    media_type: home_video
+    collection: "Family Movies"
+    year: 1993
+    people:
+      - john
+      - gillian
+      - betty
+      - mom
+      - dad
+    locations:
+      - lake_oswego_house
+    occasions:
+      - 4th_of_july
+    tags:
+      - vhs
+      - digitized
+    duration: 00:03:41
+    file: videos/home_videos/popenucks_december_1991_summer_1993/4th_of_july_1993.mp4
+    recapture: false

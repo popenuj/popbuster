@@ -136,16 +136,35 @@ def parse_args() -> argparse.Namespace:
 
 def read_rows(project_root: Path, csv_path: Path, default_tape_id: str) -> list[ClipRow]:
     rows: list[ClipRow] = []
-    with csv_path.expanduser().open(newline="", encoding="utf-8-sig") as file:
+    csv_path = csv_path.expanduser()
+    if looks_like_zip(csv_path):
+        raise SystemExit(
+            f"{csv_path} looks like a Numbers spreadsheet file, not a CSV. "
+            "In Numbers, use File > Export To > CSV, then run this script on the exported .csv."
+        )
+    try:
+        file = csv_path.open(newline="", encoding="utf-8-sig")
+    except UnicodeDecodeError as error:
+        raise SystemExit(f"{csv_path} is not a UTF-8 CSV export.") from error
+
+    with file:
         reader = csv.DictReader(file)
-        if not reader.fieldnames:
-            raise SystemExit("Batch CSV is missing a header row.")
-        for index, raw_row in enumerate(reader, start=2):
-            row = normalize_row(raw_row)
-            if should_skip(row):
-                continue
-            rows.append(parse_row(project_root, row, default_tape_id, index))
+        try:
+            if not reader.fieldnames:
+                raise SystemExit("Batch CSV is missing a header row.")
+            for index, raw_row in enumerate(reader, start=2):
+                row = normalize_row(raw_row)
+                if should_skip(row):
+                    continue
+                rows.append(parse_row(project_root, row, default_tape_id, index))
+        except UnicodeDecodeError as error:
+            raise SystemExit(f"{csv_path} is not a UTF-8 CSV export.") from error
     return rows
+
+
+def looks_like_zip(path: Path) -> bool:
+    with path.open("rb") as file:
+        return file.read(4) == b"PK\x03\x04"
 
 
 def normalize_row(raw_row: dict[str, str | None]) -> dict[str, str]:
@@ -197,9 +216,13 @@ def parse_row(project_root: Path, row: dict[str, str], default_tape_id: str, lin
     )
 
     if not ID_PATTERN.match(clip.clip_id):
-        raise SystemExit(f"CSV line {line_number}: id must use lowercase letters, numbers, and underscores.")
+        raise SystemExit(
+            f"CSV line {line_number}: id {clip.clip_id!r} must use lowercase letters, numbers, and underscores."
+        )
     if not ID_PATTERN.match(clip.tape_id):
-        raise SystemExit(f"CSV line {line_number}: tape_id must use lowercase letters, numbers, and underscores.")
+        raise SystemExit(
+            f"CSV line {line_number}: tape_id {clip.tape_id!r} must use lowercase letters, numbers, and underscores."
+        )
     parse_time(start)
     parse_time(stop)
     _ = clip.duration

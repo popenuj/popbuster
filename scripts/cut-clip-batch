@@ -1,0 +1,348 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PYTHON_BIN="${PROJECT_ROOT}/.venv/bin/python"
+if [[ ! -x "${PYTHON_BIN}" ]]; then
+  PYTHON_BIN="python3"
+fi
+
+"${PYTHON_BIN}" - "${PROJECT_ROOT}" "$@" <<'PY'
+from __future__ import annotations
+
+import argparse
+import csv
+from dataclasses import dataclass
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+import json
+from pathlib import Path
+import re
+import subprocess
+import sys
+from typing import Any
+
+import yaml
+
+
+DEFAULT_MEDIA_TYPE = "home_video"
+DEFAULT_COLLECTION = "Family Movies"
+DEFAULT_TAGS = ("vhs", "digitized")
+DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+ID_PATTERN = re.compile(r"^[a-z0-9_]+$")
+TRUTHY = {"1", "true", "t", "yes", "y"}
+FALSY = {"0", "false", "f", "no", "n"}
+
+
+@dataclass(frozen=True)
+class ClipRow:
+    clip_id: str
+    tape_id: str
+    title: str
+    start: str
+    stop: str
+    date: str | None
+    year: int | None
+    people: tuple[str, ...]
+    pets: tuple[str, ...]
+    locations: tuple[str, ...]
+    occasions: tuple[str, ...]
+    recapture: bool | None
+
+    @property
+    def duration(self) -> str:
+        seconds = parse_time(self.stop) - parse_time(self.start)
+        if seconds <= 0:
+            raise ValueError(f"{self.clip_id}: stop must be later than start")
+        whole_seconds = int(seconds.to_integral_value(rounding=ROUND_HALF_UP))
+        hours, remainder = divmod(whole_seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return f"{hours:02}:{minutes:02}:{seconds:02}"
+
+    @property
+    def asset_path(self) -> Path:
+        return Path("videos") / "home_videos" / self.tape_id / f"{self.clip_id}.mp4"
+
+    @property
+    def output_path(self) -> Path:
+        return Path("assets") / self.asset_path
+
+
+def main() -> int:
+    args = parse_args()
+    project_root = Path(args.project_root)
+    input_path = args.input or Path.home() / "Downloads" / f"{args.tape_id}.mkv"
+    csv_path = args.csv or Path.home() / "Downloads" / f"{args.tape_id}.csv"
+    rows = read_rows(project_root, csv_path, args.tape_id)
+
+    if not rows:
+        print("No clips found in batch CSV.")
+        return 0
+
+    validate_rows(project_root, rows)
+
+    for row in rows:
+        output_path = project_root / row.output_path
+        command = [
+            str(project_root / "scripts" / "cut-clip"),
+            str(input_path.expanduser()),
+            row.start,
+            row.stop,
+            str(output_path),
+        ]
+        print(" ".join(command))
+        if not args.dry_run:
+            subprocess.run(command, check=True)
+
+    if args.dry_run:
+        print()
+        print("YAML preview:")
+        print(render_video_entries(rows), end="")
+        return 0
+
+    videos_path = project_root / "assets" / "library" / "videos.yml"
+    append_video_entries(videos_path, rows)
+
+    subprocess.run([str(project_root / "scripts" / "validate-library")], check=True)
+    return 0
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Cut a batch of VHS clips from a Numbers-exported CSV and append videos.yml records.",
+    )
+    parser.add_argument("tape_id", help="Physical source tape id from assets/library/tapes.yml.")
+    parser.add_argument(
+        "--input",
+        type=Path,
+        help="Full OBS capture file. Defaults to ~/Downloads/<tape_id>.mkv.",
+    )
+    parser.add_argument(
+        "--csv",
+        type=Path,
+        help="CSV exported from Numbers. Defaults to ~/Downloads/<tape_id>.csv.",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Print cut commands and YAML without creating clips or editing videos.yml.",
+    )
+    parser.add_argument(
+        "--project-root",
+        default=sys.argv[1],
+        help=argparse.SUPPRESS,
+    )
+    return parser.parse_args(sys.argv[2:])
+
+
+def read_rows(project_root: Path, csv_path: Path, default_tape_id: str) -> list[ClipRow]:
+    rows: list[ClipRow] = []
+    with csv_path.expanduser().open(newline="", encoding="utf-8-sig") as file:
+        reader = csv.DictReader(file)
+        if not reader.fieldnames:
+            raise SystemExit("Batch CSV is missing a header row.")
+        for index, raw_row in enumerate(reader, start=2):
+            row = normalize_row(raw_row)
+            if should_skip(row):
+                continue
+            rows.append(parse_row(project_root, row, default_tape_id, index))
+    return rows
+
+
+def normalize_row(raw_row: dict[str, str | None]) -> dict[str, str]:
+    return {
+        normalize_header(key): clean_cell(value)
+        for key, value in raw_row.items()
+        if key is not None
+    }
+
+
+def normalize_header(value: str) -> str:
+    return value.strip().lower().replace(" ", "_").replace("-", "_")
+
+
+def clean_cell(value: str | None) -> str:
+    return (value or "").strip()
+
+
+def should_skip(row: dict[str, str]) -> bool:
+    value = row.get("skip", "")
+    return bool(value) and value.lower() in TRUTHY
+
+
+def parse_row(project_root: Path, row: dict[str, str], default_tape_id: str, line_number: int) -> ClipRow:
+    clip_id = required(row, "id", line_number)
+    tape_id = row.get("tape_id") or default_tape_id
+    title = required(row, "title", line_number)
+    start = required(row, "start", line_number)
+    stop = required(row, "stop", line_number)
+    date = optional(row, "date")
+    year = parse_year(optional(row, "year"), date, line_number)
+
+    recapture_value = optional(row, "recapture")
+    recapture = parse_bool(recapture_value, line_number) if recapture_value is not None else None
+
+    clip = ClipRow(
+        clip_id=clip_id,
+        tape_id=tape_id,
+        title=title,
+        start=start,
+        stop=stop,
+        date=date,
+        year=year,
+        people=parse_list(row.get("people", "")),
+        pets=parse_list(row.get("pets", "")),
+        locations=parse_list(row.get("locations", "")),
+        occasions=parse_list(row.get("occasions", "")),
+        recapture=recapture,
+    )
+
+    if not ID_PATTERN.match(clip.clip_id):
+        raise SystemExit(f"CSV line {line_number}: id must use lowercase letters, numbers, and underscores.")
+    if not ID_PATTERN.match(clip.tape_id):
+        raise SystemExit(f"CSV line {line_number}: tape_id must use lowercase letters, numbers, and underscores.")
+    parse_time(start)
+    parse_time(stop)
+    _ = clip.duration
+
+    output_path = project_root / clip.output_path
+    if output_path.exists():
+        raise SystemExit(f"CSV line {line_number}: output already exists: {output_path}")
+
+    return clip
+
+
+def required(row: dict[str, str], key: str, line_number: int) -> str:
+    value = row.get(key, "")
+    if not value:
+        raise SystemExit(f"CSV line {line_number}: missing required column value '{key}'.")
+    return value
+
+
+def optional(row: dict[str, str], key: str) -> str | None:
+    value = row.get(key, "")
+    return value or None
+
+
+def parse_year(value: str | None, date: str | None, line_number: int) -> int | None:
+    if value:
+        try:
+            return int(value)
+        except ValueError as error:
+            raise SystemExit(f"CSV line {line_number}: year must be an integer.") from error
+    if date:
+        if not DATE_PATTERN.match(date):
+            raise SystemExit(f"CSV line {line_number}: date should use YYYY-MM-DD.")
+        return int(date[:4])
+    return None
+
+
+def parse_bool(value: str, line_number: int) -> bool:
+    normalized = value.lower()
+    if normalized in TRUTHY:
+        return True
+    if normalized in FALSY:
+        return False
+    raise SystemExit(f"CSV line {line_number}: recapture must be true or false.")
+
+
+def parse_list(value: str) -> tuple[str, ...]:
+    if not value:
+        return ()
+    if "|" in value:
+        parts = value.split("|")
+    else:
+        parts = value.split(";")
+    return tuple(part.strip() for part in parts if part.strip())
+
+
+def parse_time(value: str) -> Decimal:
+    parts = value.split(":")
+    if len(parts) > 3:
+        raise ValueError("expected SS, MM:SS, or HH:MM:SS")
+    total = Decimal("0")
+    for part in parts:
+        if not part:
+            raise ValueError("empty time component")
+        try:
+            component = Decimal(part)
+        except InvalidOperation as error:
+            raise ValueError(f"invalid time component: {part}") from error
+        total = total * 60 + component
+    return total
+
+
+def validate_rows(project_root: Path, rows: list[ClipRow]) -> None:
+    videos_path = project_root / "assets" / "library" / "videos.yml"
+    tapes_path = project_root / "assets" / "library" / "tapes.yml"
+    videos = read_yaml(videos_path).get("videos", [])
+    tapes = read_yaml(tapes_path).get("tapes", [])
+    existing_ids = {str(video.get("id")) for video in videos}
+    known_tape_ids = {str(tape.get("id")) for tape in tapes}
+    batch_ids: set[str] = set()
+
+    for row in rows:
+        if row.clip_id in existing_ids:
+            raise SystemExit(f"{row.clip_id}: already exists in videos.yml.")
+        if row.clip_id in batch_ids:
+            raise SystemExit(f"{row.clip_id}: duplicate id in batch CSV.")
+        if row.tape_id not in known_tape_ids:
+            raise SystemExit(f"{row.clip_id}: unknown tape_id '{row.tape_id}' in tapes.yml.")
+        batch_ids.add(row.clip_id)
+
+
+def read_yaml(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+
+
+def append_video_entries(videos_path: Path, rows: list[ClipRow]) -> None:
+    existing = videos_path.read_text(encoding="utf-8").rstrip()
+    rendered = render_video_entries(rows).rstrip()
+    videos_path.write_text(f"{existing}\n\n{rendered}\n", encoding="utf-8")
+
+
+def render_video_entries(rows: list[ClipRow]) -> str:
+    return "\n\n".join(render_video_entry(row) for row in rows) + "\n"
+
+
+def render_video_entry(row: ClipRow) -> str:
+    lines = [
+        f"  - id: {row.clip_id}",
+        f"    tape_id: {row.tape_id}",
+        f"    title: {quote(row.title)}",
+        f"    media_type: {DEFAULT_MEDIA_TYPE}",
+        f"    collection: {quote(DEFAULT_COLLECTION)}",
+    ]
+    if row.date:
+        lines.append(f"    date: {row.date}")
+    if row.year is not None:
+        lines.append(f"    year: {row.year}")
+    append_list(lines, "people", row.people)
+    append_list(lines, "pets", row.pets)
+    append_list(lines, "locations", row.locations)
+    append_list(lines, "occasions", row.occasions)
+    lines.extend([
+        "    tags:",
+        *[f"      - {tag}" for tag in DEFAULT_TAGS],
+        f"    duration: {row.duration}",
+        f"    file: {row.asset_path.as_posix()}",
+    ])
+    if row.recapture is not None:
+        lines.append(f"    recapture: {str(row.recapture).lower()}")
+    return "\n".join(lines)
+
+
+def append_list(lines: list[str], key: str, values: tuple[str, ...]) -> None:
+    if not values:
+        return
+    lines.append(f"    {key}:")
+    lines.extend(f"      - {value}" for value in values)
+
+
+def quote(value: str) -> str:
+    return json.dumps(value)
+
+
+raise SystemExit(main())
+PY

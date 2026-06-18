@@ -495,17 +495,38 @@ scripts/cut-clip captures/vhs_01_full.mkv 00:12:15 00:14:45 assets/videos/home_v
 
 The script creates the output folder, trims the selected segment between those bounds, and normalizes the result to Popbuster's 800x480 H.264/AAC playback format. Keep the full tape capture untouched as the archive master.
 
+For a full tape, make a CSV in Numbers and export it as CSV. Required columns are `id`, `title`, `start`, and `stop`; optional columns are `date`, `year`, `people`, `pets`, `locations`, `occasions`, `recapture`, `tape_id`, and `skip`. Use `|` between multiple people, pets, locations, or occasions:
+
+```csv
+id,title,start,stop,date,people,locations,occasions
+april_21_1991,"April 21, 1991, Albany",01:57:01,01:58:29,1991-04-21,john|dad,albany,miscellaneous
+```
+
+Then cut and catalog the batch:
+
+```bash
+scripts/cut-clip-batch popenucks_december_1991_summer_1993
+```
+
+The batch script defaults to `~/Downloads/<tape_id>.mkv` for the OBS capture and `~/Downloads/<tape_id>.csv` for the Numbers export. It writes each clip to `assets/videos/home_videos/<tape_id>/<id>.mp4`, computes duration from the start/stop times, appends records to `assets/library/videos.yml`, and runs `scripts/validate-library`. Use `--dry-run` to preview the cut commands and YAML without writing files.
+
+If the files do not use the tape id as their name, pass them explicitly:
+
+```bash
+scripts/cut-clip-batch popenucks_december_1991_summer_1993 --input ~/Downloads/capture.mkv --csv ~/Downloads/clips.csv
+```
+
 Suggested clip paths:
 
 ```text
-assets/videos/home_videos/<year>/<occasion>/<clip_id>.mp4
+assets/videos/home_videos/<tape_id>/<clip_id>.mp4
 ```
 
-Use `unknown` or `miscellaneous` in the path when the occasion is not clear:
+For example:
 
 ```text
-assets/videos/home_videos/1995/unknown/clip_001.mp4
-assets/videos/home_videos/1995/miscellaneous/backyard_summer.mp4
+assets/videos/home_videos/rinaldi_popenuck_1996/july_4_1996.mp4
+assets/videos/home_videos/popenucks_december_1991_summer_1993/april_21_1991.mp4
 ```
 
 ## Commercials
